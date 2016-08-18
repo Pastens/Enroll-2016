@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ZJUBTV 面试考核系统</title>
+    <!-- Bootstrap core CSS -->
+    <css href="__PUBLIC__/css/bootstrap.min.css" />
+    <!-- Custom CSS-->
+    <css href="__PUBLIC__/css/list.css" />
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="{$profile_url}">个人页面</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{$logout_url}">登出</a></li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="starter-template">
+
+            <h2>面试简讯</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>考场号</th>
+                            <th>考场状态</th>
+                            <th>隶属部门</th>
+                            <th>面试环节</th>
+                            <th>参与人数</th>
+                            <th>操作</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th>{$fetchRoom['roomnumber']}</th>
+                            <th>
+                                <?php
+                                        switch ($fetchRoom['roomstatus']) {
+                                            case 0:
+                                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                                break;
+                                            case 1:
+                                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
+                                                break;
+                                            case 2:
+                                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
+                                                break;
+                                        }
+                                    ?>
+                            </th>
+                            <th>
+                                <?php
+                                        switch ($fetchRoom['sector']) {
+                                            case 0:
+                                                echo '未知';
+                                                break;
+                                            case 1:
+                                                echo '电视台';
+                                                break;
+                                            case 2:
+                                                echo '广播台';
+                                                break;
+                                            case 3:
+                                                echo '校报部';
+                                                break;
+                                        }
+                                    ?>
+                            </th>
+                            <th>{$fetchRound}</th>
+                            <th>共{$fetchGroup['member_count']}人参加</th>
+                            <th>
+                                <form action="{$terminateInterview_url}" method="post">
+                                    <input type="hidden" name="rid" value="{$rid}">
+                                    <button class="btn btn-xs btn-success btn-block" type="submit">结束本场面试</button>
+                                </form>
+                            </th>
+                            <th>
+                                <a href="{$ratectl_url}" target="_blank" class="btn btn-xs btn-success btn-block" type="submit">成绩考核</button>
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>面试者详情</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>流水</th>
+                            <th>标签</th>
+                            <th>M</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>备注</th>
+                            <th></th>
+                            <th>操作</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <volist name="fetchInterviewee" id="i">
+                            <tr>
+                                <th>{$joinEnroll[$i['li']][0]['studentname']}</th>
+                                <th sn="{$i['serialnumber']}">{$i['serialdigit']}</th>
+                                <th>
+                                    <?php
+                                            $Tag = M('tags');
+                                            $map['studentid'] = $i['studentid'];
+                                            $map['serialnumber'] = $i['serialnumber'];
+                                            $map['uid'] = $_SESSION['login_uid'];
+                                            $Rounds = M('status_round');
+                                            $fetchRound = $Rounds->find();
+                                            $map['round'] = $fetchRound['round'];
+
+                                            for($j = 0; $j < count($tagsmeta); $j++){
+                                                echo '<form action="' . $setTags_url . '" method="post">';
+                                                echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                                echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                                echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                                echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                                echo '<input type="hidden" name="tagid" value="' . $tagsmeta[$j]['tagid'] . '">';
+                                                $map['tags'] = $tagsmeta[$j]['tagid'];
+                                                $fetch = $Tag->where($map)->find();
+                                                if($fetch)
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="' . $tagsmeta[$j]['description'] . '">';
+                                                else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="' . $tagsmeta[$j]['description'] . '">';
+                                                echo '</form>';
+                                            }
+                                        ?>
+                                </th>
+                                <?php
+                                            $Rate = M('rates');
+                                            $map['studentid'] = $i['studentid'];
+                                            $map['serialnumber'] = $i['serialnumber'];
+                                            $map['uid'] = $_SESSION['login_uid'];
+                                            $Rounds = M('status_round');
+                                            $fetchRound = $Rounds->find();
+                                            $map['round'] = $fetchRound['round'];
+                                            $fetchRate = $Rate->where($map)->find();
+                                            echo '<th>';
+                                            echo '<form action="' . $setMark_url . '" method="post">';
+                                            echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                            echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                            echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                            echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                            echo '<input type="hidden" name="val" value="5">';
+                                            if($fetchRate['rating'] == 5)
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="5">';
+                                            else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="5">';
+                                            echo '</form>';
+                                            echo '</th><th>';
+                                            echo '<form action="' . $setMark_url . '" method="post">';
+                                            echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                            echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                            echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                            echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                            echo '<input type="hidden" name="val" value="4">';
+                                            if($fetchRate['rating'] == 4)
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="4">';
+                                            else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="4">';
+                                            echo '</form>';
+                                            echo '</th><th>';
+                                            echo '<form action="' . $setMark_url . '" method="post">';
+                                            echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                            echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                            echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                            echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                            echo '<input type="hidden" name="val" value="3">';
+                                            if($fetchRate['rating'] == 3)
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="3">';
+                                            else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="3">';
+                                            echo '</form>';
+                                            echo '</th><th>';
+                                            echo '<form action="' . $setMark_url . '" method="post">';
+                                            echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                            echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                            echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                            echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                            echo '<input type="hidden" name="val" value="2">';
+                                            if($fetchRate['rating'] == 2)
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="2">';
+                                            else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="2">';
+                                            echo '</form>';
+                                            echo '</th><th>';
+                                            echo '<form action="' . $setMark_url . '" method="post">';
+                                            echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                            echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                            echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                            echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                            echo '<input type="hidden" name="val" value="1">';
+                                            if($fetchRate['rating'] == 1)
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="1">';
+                                            else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="1">';
+                                            echo '</form>';
+                                            echo '</th><th>';
+                                            echo '<form action="' . $setMark_url . '" method="post">';
+                                            echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                            echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
+                                            echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+                                            echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                            echo '<input type="hidden" name="val" value="0">';
+                                            if($fetchRate['rating'] === "0")
+                                                echo '<input class="btn btn-xs btn-success" type="submit" value="0">';
+                                            else
+                                                echo '<input class="btn btn-xs btn-default" type="submit" value="0">';
+                                            echo '</form>';
+                                            echo '</th>';
+                                        ?>
+                                    <th>
+                                        <?php
+                                            $Comment = M('comments');
+                                            $map['studentid'] = $i['studentid'];
+                                            $map['serialnumber'] = $i['serialnumber'];
+                                            $map['uid'] = $_SESSION['login_uid'];
+                                            $Rounds = M('status_round');
+                                            $fetchRound = $Rounds->find();
+                                            $map['round'] = $fetchRound['round'];
+                                            $comments = $Comment->where($map)->select();
+                                            if($comments){
+                                                foreach($comments as $comm){
+                                                    echo '<form action="' . $rmvComm_url . '" method="post">';
+                                                    echo '<input type="hidden" name="commId" value="' . $comm['commid'] . '">';
+                                                    echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                                    echo '[' . $comm['comment'] . ']';
+                                                    echo '<input class="btn btn-xs btn-danger"  type="submit" value="DEL">';
+                                                    echo '</form>';
+                                                }
+                                            }else{
+                                                echo '尚未有备注';
+                                            }
+                                        ?>
+                                    </th>
+                                    <th>
+                                        <form action="{$setComm_url}" method="post">
+                                            <input type="hidden" name="stuId" value="{$i['studentid']}">
+                                            <input type="hidden" name="sn" value="{$i['serialnumber']}">
+                                            <input type="hidden" name="sd" value="{$i['serialdigit']}">
+                                            <input type="text" name="comment" class="form-control" value="">
+                                            <input type="hidden" name="rid" value="{$rid}">
+                                    </th>
+                                    <th><input class="btn btn-sm btn-primary" type="submit" value="新增备注">
+                                </form></th>
+                                <th>
+                                    <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#{$i['serialnumber']}_allInfo" aria-expanded="false" aria-controls="collapseExample">
+                                      详细信息
+                                    </button>
+                                </th>
+                                <th>
+                                    <?php
+                                        echo '<a href="';
+                                        echo U('Home/Index/allinfo_get', array('sn'=>$i['serialnumber']));
+                                        echo '" target="_blank" class="btn btn-info btn-sm">全部信息</a>';
+                                    ?>
+                                </th>
+                            </tr>
+                                <div class="collapse col-md-12" id="{$i['serialnumber']}_allInfo">
+                                  <div class="well">
+                                      <pre class="detials-info-sm">
+{$i['serialdigit']} &#9 {$jEL[$i['li']]['studentname']}  &#9 {$jEL[$i['li']]['mobilephone']}/{$jEL[$i['li']]['shortphone']} &#9 {$jEL[$i['li']]['birthplace']} &#9 {$jEL[$i['li']]['dormitory']} &#9 {$jEL[$i['li']]['grade']} &#9 {$jEL[$i['li']]['major']}<br />
+{$jEL[$i['li']]['job1']} &#9 {$jEL[$i['li']]['job2']} &#9 {$jEL[$i['li']]['job3']} &#9 {$jEL[$i['li']]['job4']} &#9 {$jEL[$i['li']]['job5']}
+<br />
+<span><img class="photo" style="width: 140px; height: auto; " src="https://join.zjubtv.com/ZJUCardPhoto/photo.do?pid={$i['studentid']}"></span>
+<span>{$jEL[$i['li']]['introduction']}</span>
+<a class="btn btn-default btn-sm" data-toggle="collapse" data-target="#{$i['serialnumber']}_allInfo" aria-expanded="false" aria-controls="collapseExample" target="button_detailInfo-SN_{$i['serialnumber']}">收起</a>
+                                      </pre>
+                                  </div>
+                                </div>
+                        </volist>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <!--        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>-->
+    <js href="__PUBLIC__/js/jquery-1.11.3.min.js" />
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <js href="__PUBLIC__/js/bootstrap.min.js" />
+
+</body>
+
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>ZJUBTV 面试考核系统</title>
+        <!-- Bootstrap core CSS -->
+        <css href="__PUBLIC__/css/bootstrap.min.css" />
+        <!-- Custom CSS-->
+        <css href="__PUBLIC__/css/list.css" />
+
+    </head>
+
+    <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="{$profile_url}">个人页面</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{$logout_url}">登出</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <div class="starter-template">
+          <div class="table-responsive">
+
+              <!-- <form class="" action="index.html" method="post">
+                  <button type="submit" class="btn btn-m btn-primary btn-block">刷新分组数据</button>
+              </form> -->
+
+              <h2>成绩队列</h2>
+              <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>学号</th>
+                      <th>姓名</th>
+                      <th>性别</th>
+                      <th>联系方式</th>
+                      <th>采纳部门</th>
+                      <th>成绩</th>
+                      <th>Tags</th>
+                      <th>备注</th>
+                      <th>操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <volist name="fetchRate" id="r">
+                        <tr>
+                            <th><a href="https://bbs.zjutv.com/candidates.php?keyword={$r.studentid}" target="_blank">{$r.studentid}</a></th>
+                            <th>{$mapToEnroll[$r['serialnumber']]['studentname']}</th>
+                            <th>
+                                <?php
+                                    switch ($mapToEnroll[$r['serialnumber']]['gender']){
+                                        case 0:
+                                            echo '女';
+                                            break;
+                                        case 1:
+                                            echo '男';
+                                            break;
+                                    }
+                                ?>
+                            </th>
+                            <th>{$mapToEnroll[$r['serialnumber']]['mobilephone']}/{$mapToEnroll[$r['serialnumber']]['shortphone']}</th>
+                            <th>
+                                <?php
+                                  switch ($mapToInterv[$r['serialnumber']]['multisector']) {
+                                      case 0:
+                                          echo '未知';
+                                          break;
+                                      case 1:
+                                          echo '电视台';
+                                          break;
+                                      case 2:
+                                          echo '广播台';
+                                          break;
+                                      case 3:
+                                          echo '电视台 广播台';
+                                          break;
+                                      case 4:
+                                          echo '校报社';
+                                          break;
+                                      case 5:
+                                          echo '电视台 校报社';
+                                          break;
+                                      case 6:
+                                          echo '广播台 校报社';
+                                          break;
+                                      case 7:
+                                          echo '电视台 广播台 校报社';
+                                          break;
+                                  }
+                              ?>
+                            </th>
+                            <th>
+                                {$r['rating']}
+                            </th>
+                            <th>
+                                <?php
+                                    $Tagsmeta = M('tags_meta');
+                                    $fetchMeta = $Tagsmeta->select();
+                                    foreach($mapToTag[$r['serialnumber']] as $s_tag){
+                                        $tagid = $s_tag['tags'] - 1;
+                                        echo '<input class="btn btn-xs btn-info" type="submit" value="' . $fetchMeta[$tagid]['description'] . '">';
+                                    }
+                                ?>
+                            </th>
+                            <th>
+                                <?php
+                                    foreach($mapToCommen[$r['serialnumber']] as $s_comment){
+                                        echo '<input class="btn btn-xs btn-info" type="submit" value="' . $s_comment['comment'] . '">';
+                                    }
+                                ?>
+                            </th>
+                            <th>
+                                <?php
+                                    $User = M('users');
+                                    $fetchUser = $User->where('uid = ' . $_SESSION['login_uid'])->find();
+                                    $loginUserSector = $fetchUser['sector'];
+                                    switch ($loginUserSector) {
+                                        case '1':
+                                            $sectorFlag = 1;
+                                            $sectorNFlag = 6;
+                                            break;
+                                        case '2':
+                                            $sectorFlag = 2;
+                                            $sectorNFlag = 5;
+                                            break;
+                                        case '3':
+                                            $sectorFlag = 4;
+                                            $sectorNFlag = 3;
+                                            break;
+                                        default:
+                                            $sectorFlag = 0;
+                                            $sectorNFlag = 7;
+                                            break;
+                                    }
+
+                                    $originSector = $mapToInterv[$r['serialnumber']]['multisector'];
+
+                                    //if(($originSector & $sectorFlag) == $sectorFlag)
+
+                                    if($fetchRound['round'] == 2 || $fetchRound['round'] == 254) {
+                                        echo '<form action="' . $admission_url . '" method="post">';
+                                        echo '<input type="hidden" name="sn" value="' . $r['serialnumber'] . '">';
+                                        if(($originSector & $sectorFlag) == $sectorFlag){
+                                            echo '<input type="hidden" name="request" value="getOut">';
+                                            echo '<button class="btn btn-xs btn-success btn-block" type="submit">二面</button>';
+                                        }else{
+                                            echo '<input type="hidden" name="request" value="getIn">';
+                                            echo '<button class="btn btn-xs btn-danger btn-block" type="submit">未入二面</button>';
+                                        }
+                                        echo '</form>';
+                                    }
+                                    if($fetchRound['round'] == 6 || $fetchRound['round'] == 255) {
+                                        echo '<form action="' . $admission_url . '" method="post">';
+                                        echo '<input type="hidden" name="sn" value="' . $r['serialnumber'] . '">';
+                                        if(($originSector & $sectorFlag) == $sectorFlag){
+                                            echo '<input type="hidden" name="request" value="getOut">';
+                                            echo '<button class="btn btn-xs btn-success btn-block" type="submit">录取</button>';
+                                        }else{
+                                            echo '<input type="hidden" name="request" value="getIn">';
+                                            echo '<button class="btn btn-xs btn-danger btn-block" type="submit">未录取</button>';
+                                        }
+                                        echo '</form>';
+                                    }
+                                ?>
+                            </th>
+                        </tr>
+                      </volist>
+                  </tbody>
+                </table>
+
+            </div>
+        </div>
+
+    </div><!-- /.container -->
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <js href="__PUBLIC__/js/jquery-1.11.3.min.js" />
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <js href="__PUBLIC__/js/bootstrap.min.js" />
+
+    </body>
+</html>

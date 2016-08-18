@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>ZJUBTV 面试考核系统</title>
+        <!-- Bootstrap core CSS -->
+        <css href="__PUBLIC__/css/bootstrap.min.css" />
+        <!-- Custom CSS-->
+        <css href="__PUBLIC__/css/list.css" />
+
+    </head>
+
+    <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="{$profile_url}">个人页面</a></li>
+          </ul>
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="{$logout_url}">登出</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <div class="starter-template">
+<!--
+        <h1>Bootstrap starter template</h1>
+        <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
+-->
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                  <thead>
+                <tr>
+                    <volist name="fetchRoom" id="r">
+                        <th>所属部门</th>
+                        <th>当前状态</th>
+                        <th></th>
+                    </volist>
+                </tr>
+              </thead>
+              <tbody>
+                  <volist name="fetchRoom" id="r">
+                      <th>
+                          <?php
+                             $Sector = M('sectors');
+                             $fetchSector = $Sector->where('sid = ' . $r['sector'])->find();
+                             echo $fetchSector['description'] . ' ';
+                          ?>
+                          {$r.roomnumber}
+                      </th>
+                      <th>
+                          <?php
+                        switch ($r['roomstatus']) {
+                            case 0:
+                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                break;
+                            case 1:
+                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
+                                break;
+                            case 2:
+                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
+                                break;
+                        }
+                    ?>
+                      </th>
+                      <th></th>
+                  </volist>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="table-responsive">
+              <table class="table table-striped">
+                <thead>
+                    <thead>
+                  <tr>
+                    <th>页面刷新</th>
+                    <th>当前时间</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                      <th><span id="remain-time"></span>秒</th>
+                    	<th><span id="current-time"></span></th>
+                    </tr>
+                </tbody>
+              </table>
+            </div>
+
+        <h2>等待队列</h2>
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                  <thead>
+                    <tr>
+                      <th>电视台</th>
+                        <th></th><th></th>
+                      <th>广播台 (此列数据不准确)</th>
+                        <th></th><th></th>
+                      <th>校报社</th>
+                        <th></th><th></th>
+                    </tr>
+              </thead>
+              <tbody>
+                  <?php
+                for($i=1; $i<=$maxrec; $i++){
+                    echo '<tr>';
+                    if($twl[$i-1] != NULL){
+                        $sn = $twl[$i-1]['serialnumber'];
+                        echo '<th>' . $twl[$i-1]['serialdigit'] . ' - ' . substr($sn, 36, 4). '</th>';
+                        echo '<th>' . substr($twl[$i-1]['inqueuetime'], 5, 11) . '</th>';
+                        echo '<th>';
+                        switch ($twl[$i-1]['status']){
+                            case 0:
+                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                break;
+                            case 1:
+                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
+                                break;
+                            case 2:
+                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
+                                break;
+                        }
+                        echo '</th>';
+                    }else{
+                        echo '<th></th><th></th><th></th>';
+                    }
+
+                    if($rwl[$i-1] != NULL){
+                        $sn = $rwl[$i-1]['serialnumber'];
+                        echo '<th>' . $rwl[$i-1]['serialdigit'] . ' - ' . substr($sn, 36, 4). '</th>';
+                        echo '<th>' . substr($rwl[$i-1]['inqueuetime'], 5, 11) . '</th>';
+                        echo '<th>';
+                        switch ($rwl[$i-1]['status']){
+                            case 0:
+                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                break;
+                            case 1:
+                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
+                                break;
+                            case 2:
+                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
+                                break;
+                        }
+                        echo '</th>';
+                    }else{
+                        echo '<th></th><th></th><th></th>';
+                    }
+
+                    if($nwl[$i-1] != NULL){
+                        $sn = $nwl[$i-1]['serialnumber'];
+                        echo '<th>' . $nwl[$i-1]['serialdigit'] . ' - ' . substr($sn, 36, 4). '</th>';
+                        echo '<th>' . substr($nwl[$i-1]['inqueuetime'], 5, 11) . '</th>';
+                        echo '<th>';
+                        switch ($nwl[$i-1]['status']){
+                            case 0:
+                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                break;
+                            case 1:
+                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
+                                break;
+                            case 2:
+                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
+                                break;
+                        }
+                        echo '</th>';
+                    }else{
+                        echo '<th></th><th></th><th></th>';
+                    }
+                    echo '</tr>';
+                }
+            ?>
+              </tbody>
+            </table>
+          </div>
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!--        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>-->
+        <js href="__PUBLIC__/js/jquery-1.11.3.min.js" />
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <js href="__PUBLIC__/js/bootstrap.min.js" />
+        <script type="text/javascript">
+            $(document).ready(function()
+            {
+                refresh();
+                getCurrentTime();
+            });
+            function refresh()
+            {
+                var timer=30;
+                $("#remain-time").text(timer);
+                setInterval(function()
+                {
+                    if(timer!=1)
+                    {
+                        timer=timer-1;
+                        $("#remain-time").text(timer);
+                    }
+                    else
+                        location.reload(true);
+                },1000);
+            }
+            function getCurrentTime()
+            {
+                var now = (new Date()).toLocaleString();
+
+                $('#current-time').text(now);
+                setInterval(function() {
+                    var now = (new Date()).toLocaleString();
+                    $('#current-time').text(now);
+                }, 1000);
+            }
+
+        </script>
+
+    </body>
+</html>

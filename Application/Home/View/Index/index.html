@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>ZJUBTV 面试考核系统</title>
+        <!-- Bootstrap core CSS -->
+        <css href="__PUBLIC__/css/bootstrap.min.css" />
+        <!-- Custom CSS-->
+        <css href="__PUBLIC__/css/login.css" />
+
+    </head>
+    <body>
+
+        <div class="container">
+            <form class="form-signin" action="{$login_url}" method="post">
+                <h3 class="form-signin-heading">面试考核系统</h3>
+                <label for="inputUsername" class="sr-only">Username</label>
+                <input type="text" id="inputUsername" name="username" class="form-control" placeholder="登录账户" required="" autofocus="">
+                <label for="inputPassword" class="sr-only">Password</label>
+                <input type="password" id="inputPassword" name="password" class="form-control" placeholder="登录密码" required="">
+
+                <button class="btn btn-lg btn-primary btn-block" type="submit">登入</button>
+            </form>
+        </div>
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<!--        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>-->
+        <js href="__PUBLIC__/js/jquery-1.11.3.min.js" />
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <js href="__PUBLIC__/js/bootstrap.min.js" />
+
+    </body>
+</html>
