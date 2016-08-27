@@ -17,12 +17,22 @@
 
         <div class="container">
             <form class="form-signin" action="{$login_url}" method="post">
-                <h3 class="form-signin-heading">面试考核系统</h3>
+                <h3 class="form-signin-heading" align="center">面试考核系统</h3>
                 <label for="inputUsername" class="sr-only">Username</label>
                 <input type="text" id="inputUsername" name="username" class="form-control" placeholder="登录账户" required="" autofocus="">
                 <label for="inputPassword" class="sr-only">Password</label>
                 <input type="password" id="inputPassword" name="password" class="form-control" placeholder="登录密码" required="">
-
+                <label for='checkin' class="sr-only">检录</label>
+                <input type="radio" id='checkin' name="authority" value=1 checked="checked">检录
+                <label for='guide' class="sr-only">引导</label>
+                <input type="radio" id='guide' name="authority" value=3 >引导
+                <label for='associate_interviewer' class="sr-only">辅面试官</label>
+                <input type="radio" id='associate_interviewer' name="authority" value=4 >辅面试官
+                <label for='primary_interviewer' class="sr-only">主面试官</label>
+                <input type="radio" id='primary_interviewer' name="authority" value=8 >主面试官
+                <label for='administrator' class="sr-only">管理员</label>
+                <input type="radio" id='administrator' name="authority" value=16 >管理员
+                <br/> <br/>
                 <button class="btn btn-lg btn-primary btn-block" type="submit">登入</button>
             </form>
         </div>

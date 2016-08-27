@@ -25,12 +25,9 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
+          <a class="navbar-brand">面试考核系统</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="{$profile_url}">个人页面</a></li>
-          </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="{$logout_url}">登出</a></li>
           </ul>
@@ -39,20 +36,13 @@
     </nav>
 
     <div class="container">
-
       <div class="starter-template">
-<!--
-        <h1>Bootstrap starter template</h1>
-        <p class="lead">Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.</p>
--->
-
         <div class="table-responsive">
             <table class="table table-striped">
               <thead>
-                  <thead>
                 <tr>
                     <volist name="fetchRoom" id="r">
-                        <th>所属部门</th>
+                        <th>考点门牌</th>
                         <th>当前状态</th>
                         <th></th>
                     </volist>
@@ -61,27 +51,22 @@
               <tbody>
                   <volist name="fetchRoom" id="r">
                       <th>
-                          <?php
-                             $Sector = M('sectors');
-                             $fetchSector = $Sector->where('sid = ' . $r['sector'])->find();
-                             echo $fetchSector['description'] . ' ';
-                          ?>
                           {$r.roomnumber}
                       </th>
                       <th>
                           <?php
-                        switch ($r['roomstatus']) {
-                            case 0:
-                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
-                                break;
-                            case 1:
-                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
-                                break;
-                            case 2:
-                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
-                                break;
-                        }
-                    ?>
+                            switch ($r['roomstatus']) {
+                                case 0:
+                                    echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                    break;
+                                case 1:
+                                    echo '<button class="btn btn-xs btn-success btn-block">面试官正在啃瓜休息。。</button>';
+                                    break;
+                                case 2:
+                                    echo '<button class="btn btn-xs btn-danger btn-block">开始面试</button>';
+                                    break;
+                            }
+                          ?>
                       </th>
                       <th></th>
                   </volist>
@@ -107,89 +92,54 @@
               </table>
             </div>
 
-        <h2>等待队列</h2>
+        <h2>候考名单</h2>
           <div class="table-responsive">
             <table class="table table-striped">
               <thead>
                   <thead>
                     <tr>
-                      <th>电视台</th>
-                        <th></th><th></th>
-                      <th>广播台 (此列数据不准确)</th>
-                        <th></th><th></th>
-                      <th>校报社</th>
-                        <th></th><th></th>
+                    <th>学号</th>
+                    <th></th>
+                    <th>姓名</th>
+                    <th></th>
+                    <th>所报部门</th>
+                    <th></th>
                     </tr>
               </thead>
               <tbody>
-                  <?php
-                for($i=1; $i<=$maxrec; $i++){
-                    echo '<tr>';
-                    if($twl[$i-1] != NULL){
-                        $sn = $twl[$i-1]['serialnumber'];
-                        echo '<th>' . $twl[$i-1]['serialdigit'] . ' - ' . substr($sn, 36, 4). '</th>';
-                        echo '<th>' . substr($twl[$i-1]['inqueuetime'], 5, 11) . '</th>';
-                        echo '<th>';
-                        switch ($twl[$i-1]['status']){
-                            case 0:
-                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
-                                break;
-                            case 1:
-                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
-                                break;
-                            case 2:
-                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
-                                break;
-                        }
-                        echo '</th>';
-                    }else{
-                        echo '<th></th><th></th><th></th>';
-                    }
+                <?php
+                  if ($fetchGroup[0]) {
+                      foreach ($fetchGroup as $f) {
+                          if ($f['status'] == 1) {
+                              $member_count = $f['member_count'];
+                              $WL = M('waiting_list');
 
-                    if($rwl[$i-1] != NULL){
-                        $sn = $rwl[$i-1]['serialnumber'];
-                        echo '<th>' . $rwl[$i-1]['serialdigit'] . ' - ' . substr($sn, 36, 4). '</th>';
-                        echo '<th>' . substr($rwl[$i-1]['inqueuetime'], 5, 11) . '</th>';
-                        echo '<th>';
-                        switch ($rwl[$i-1]['status']){
-                            case 0:
-                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
-                                break;
-                            case 1:
-                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
-                                break;
-                            case 2:
-                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
-                                break;
-                        }
-                        echo '</th>';
-                    }else{
-                        echo '<th></th><th></th><th></th>';
-                    }
-
-                    if($nwl[$i-1] != NULL){
-                        $sn = $nwl[$i-1]['serialnumber'];
-                        echo '<th>' . $nwl[$i-1]['serialdigit'] . ' - ' . substr($sn, 36, 4). '</th>';
-                        echo '<th>' . substr($nwl[$i-1]['inqueuetime'], 5, 11) . '</th>';
-                        echo '<th>';
-                        switch ($nwl[$i-1]['status']){
-                            case 0:
-                                echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
-                                break;
-                            case 1:
-                                echo '<button class="btn btn-xs btn-success btn-block">等候分配</button>';
-                                break;
-                            case 2:
-                                echo '<button class="btn btn-xs btn-danger btn-block">正在面试</button>';
-                                break;
-                        }
-                        echo '</th>';
-                    }else{
-                        echo '<th></th><th></th><th></th>';
-                    }
-                    echo '</tr>';
-                }
-            ?>
+                              for ($i=1; $i <= $member_count; $i++) { 
+                                  $sn = $f['member'. $i .'_sn'];
+                                  $fetchWaiting = $WL->where('serialnumber = "' . $sn . '"')->find();
+                                  if($fetchWaiting) {
+                                    echo '<th>' . $fetchWaiting['studentid'] . '</th>';
+                                    echo '<th></th>';
+                                    echo '<th>' . $fetchWaiting['studentname'] . '</th>';
+                                    echo '<th></th>';
+                                    if ($fetchWaiting['sector'] & 1 == 1)
+                                      echo '<th>电视台</th>';
+                                    else
+                                      echo '<th></th>';
+                                    if ($fetchWaiting['sector'] & 2 == 2)
+                                      echo '<th>广播台</th>';
+                                    else
+                                      echo '<th></th>';                                  
+                                  }
+                                  else {
+                                    echo '<th></th><th></th><th></th><th></th><th></th><th></th>';
+                                  }
+                              }
+                              break;            
+                          }
+                      }
+                  }
+                ?>
               </tbody>
             </table>
           </div>
