@@ -129,6 +129,7 @@
                                     $is_rad = $i['multisector'] & 2;
                                     echo '<form action="' . $setMark_url . '" method="post">';
                                     echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
+                                    echo '<input type="hidden" name="rid" value="' . $rid . '">';
                                     echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
                                     echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
                                     if ($is_tel == 1) {

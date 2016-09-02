@@ -46,7 +46,7 @@ class IndexController extends Controller {
             }
 
         }
-    	
+        
     }
 
     public function logout_post(){
@@ -721,14 +721,23 @@ class IndexController extends Controller {
             $map['studentid'] = $_POST['stuId'];
             $map['serialnumber'] = $_POST['sn'];
             $map['serialdigit'] = $_POST['sd'];
-            $map['uid'] = $_SESSION['login_uid'];
             $Rounds = M('status_round');
             $fetchRound = $Rounds->find();
             $map['round'] = $fetchRound['round'];
             $rates = $Rate->where($map)->find();
+            $Room = M('rooms');
+            $fetchRoom = $Room->where('rid = '. $_POST['rid'])->find();
 
-            $map['t_rates'] = $_POST['t_rates'] ? $_POST['t_rates'] : -1;
-            $map['r_rates'] = $_POST['r_rates'] ? $_POST['r_rates'] : -1;
+            if ($fetchRoom['suid_core'] == $_SESSION['login_uid']) {
+                $map['t_rate_0'] = $_POST['t_rates'] ? $_POST['t_rates'] : -1;
+                $map['r_rate_0'] = $_POST['r_rates'] ? $_POST['r_rates'] : -1;
+            }
+            for ($i=1; $i < 5; $i++) {
+                if ($fetchRoom['suid'. $i] == $_SESSION['login_uid']) {
+                    $map['t_rate_'. $i] = $_POST['t_rates'] ? $_POST['t_rates'] : -1;
+                    $map['r_rate_'. $i] = $_POST['r_rates'] ? $_POST['r_rates'] : -1;
+                }
+            }
 
             if(!$rates){
                 if($Rate->add($map)){
@@ -816,6 +825,10 @@ class IndexController extends Controller {
             $Room = M('rooms');
             $fetchRoom = $Room->where('rid = ' . $_POST['rid'])->find();
             if(!$fetchRoom) $this->error('该场地暂无面试');
+            $Round = M('status_round');
+            $fetchRound = $Round->find();
+            if($fetchRound['round']!=2 && $fetchRound['round']!=6)
+                $this->error('该时间段不可进行面试');
 
             $succ = 0;
             $Group = M('groups');
@@ -835,10 +848,28 @@ class IndexController extends Controller {
             }
 
             if (!$succ) {
-                $this->error('无可分配小组');
+                $this->error('无可分配面试小组');
             }
 
-                // Update Room
+            // Update local & remote database
+            $Enroll = M('enroll2016_application');
+            $Interviewee = M('interviewees');
+
+            $newStatus = ($fetchRound['round'] == 2) ? 8 : 32;
+
+            $member_count = $f['member_count'];
+            for ($i=1; $i <= $member_count; $i++) { 
+                $fetchsn = $f['member'. $i .'_sn'];
+                $fetchInterviewee = $Interviewee->where('serialnumber="'.$fetchsn.'"')->find();
+                if (!$Interviewee->where('serialnumber = "'. $fetchsn .'"')->setField('status', $newStatus)) {
+                    $this->error('更新本地状态失败');
+                }
+                if (!$Enroll->where('studentid = "'. $fetchInterviewee['studentid'] .'"')->setField('resultstatus', $newStatus)) {
+                    $this->error('更新远端状态失败');
+                }
+            }
+
+            // Update Room
             $Room->where('rid = ' . $_POST['rid'])->setField('roomstatus', 2);
             $Room->where('rid = ' . $_POST['rid'])->setField('gid',$f['gid']);
 
@@ -884,15 +915,12 @@ class IndexController extends Controller {
             // Update Waiting List
             $WL = M('waiting_list');
             $Interviewee = M('interviewees');
+            $Enroll = M('enroll2016_application');
             for($i = 1; $i <= $fetchGroup['member_count']; $i++){
                 $sn = $fetchGroup['member' . $i . '_sn'];
-                $map['serialnumber'] = $sn;
-                if(!$WL->delete($sn)) $this->error('删除等待列表出错');
-                }
-
-            // Update User Status
-            if($fetchRound['round'] == 2) $Interviewee->where($map)->setField('status', 4);
-            if($fetchRound['round'] == 6) $Interviewee->where($map)->setField('status', 16);
+                $condition['serialnumber'] = $sn;
+                if(!$WL->delete($sn)) $this->error('删除等待列表出错');                
+            }
 
             // Update Group
             $Group->where('gid = ' . $gid)->setField('status', 3);
@@ -936,8 +964,8 @@ class IndexController extends Controller {
         }
 
 
-        $fetchT_rate = $Rate->where('round = ' . $fetchRound['round'])->where('t_rates >= 0')->order('t_rates desc')->select();
-        $fetchR_rate = $Rate->where('round = ' . $fetchRound['round'])->where('r_rates >= 0')->order('r_rates desc')->select();
+        $fetchT_rate = $Rate->where('round = ' . $fetchRound['round'])->where('t_status = 0')->order('t_rate_0 desc')->select();
+        $fetchR_rate = $Rate->where('round = ' . $fetchRound['round'])->where('r_status = 0')->order('r_rate_0 desc')->select();
 
         if($fetchRound['round'] == 2 || $fetchRound['round'] == 6) {
             $Enroll = M('enroll2016_application');
@@ -979,6 +1007,7 @@ class IndexController extends Controller {
         }
 
         if(IS_POST){
+            $Rate = M('rates');
             $Enroll = M('enroll2016_application');
             $Round = M('status_round');
             $fetchRound = $Round->find();
@@ -990,7 +1019,7 @@ class IndexController extends Controller {
             if($curRound != 2 && $curRound != 6){
                 $this->error('当前时段不允许更改成绩');
             }
-            if($fetchInterviewee['status'] != 4 && $fetchInterviewee['status'] != 16){
+            if($fetchInterviewee['status'] != 8 && $fetchInterviewee['status'] != 32){
                 $this->error('当前用户状态不允许更改成绩');
             }
 
@@ -1047,6 +1076,13 @@ class IndexController extends Controller {
                 default:
                     $this->error('无效的请求');
             }
+            
+            if ($_POST['sector'] == 1) {
+                $Rate->where($map)->setField('t_status', 1);
+            }
+            else
+                $Rate->where($map)->setField('r_status', 1); 
+                                 
             $this->redirect('Home/Index/grades');
         }else{
             $this->error('无效的请求');

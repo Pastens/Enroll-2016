@@ -118,21 +118,23 @@
                                   $sn = $f['member'. $i .'_sn'];
                                   $fetchWaiting = $WL->where('serialnumber = "' . $sn . '"')->find();
                                   if($fetchWaiting) {
+                                    echo '<tr>';
                                     echo '<th>' . $fetchWaiting['studentid'] . '</th>';
                                     echo '<th></th>';
                                     echo '<th>' . $fetchWaiting['studentname'] . '</th>';
                                     echo '<th></th>';
-                                    if ($fetchWaiting['sector'] & 1 == 1)
+                                    if ($fetchWaiting['sector'] == 1)
                                       echo '<th>电视台</th>';
                                     else
                                       echo '<th></th>';
-                                    if ($fetchWaiting['sector'] & 2 == 2)
+
+                                    if ($fetchWaiting['sector'] == 2)
                                       echo '<th>广播台</th>';
                                     else
-                                      echo '<th></th>';                                  
+                                      echo '<th></th></tr>';                                  
                                   }
                                   else {
-                                    echo '<th></th><th></th><th></th><th></th><th></th><th></th>';
+                                    echo '<tr><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
                                   }
                               }
                               break;            
@@ -161,7 +163,7 @@
                 $("#remain-time").text(timer);
                 setInterval(function()
                 {
-                    if(timer!=1)
+                    if(timer<=1)
                     {
                         timer=timer-1;
                         $("#remain-time").text(timer);

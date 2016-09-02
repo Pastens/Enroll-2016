@@ -33,10 +33,19 @@ CREATE TABLE IF NOT EXISTS rates(
 	studentid varchar(20) NOT NULL,
 	serialnumber varchar(255) NOT NULL,
 	serialdigit  varchar(10) NOT NULL,
-	uid int NOT NULL,
 	round int NOT NULL,
-	t_rates int NOT NULL,
-	r_rates int NOT NULL
+	r_status int default 0 NOT NULL,
+	t_status int default 0 NOT NULL,
+	t_rate_0 int default -1 NOT NULL,
+	t_rate_1 int default -1 NOT NULL,
+	t_rate_2 int default -1 NOT NULL,
+	t_rate_3 int default -1 NOT NULL,
+	t_rate_4 int default -1 NOT NULL,
+	r_rate_0 int default -1 NOT NULL,
+	r_rate_1 int default -1 NOT NULL,
+	r_rate_2 int default -1 NOT NULL,
+	r_rate_3 int default -1 NOT NULL,
+	r_rate_4 int default -1 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS comments(

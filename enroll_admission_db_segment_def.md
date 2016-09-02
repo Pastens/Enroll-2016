@@ -54,7 +54,8 @@
 - uid			***int***
 - round			***int***
 - sector		***int***
-- rating		***int*** *# 5-Rate*
+- t_rates_0~4	***int*** *# 10-Rate*
+- r_rates_0~4	***int*** *# 10-Rate*
 
 ## Comments
 - studentId		***int***
@@ -103,4 +104,3 @@
 - serialNumber	***varchar(255)***
 - sector		***int***
 
----
