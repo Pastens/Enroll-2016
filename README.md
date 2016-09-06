@@ -1,36 +1,29 @@
-# ZJUBTVEnrollSystem2016
+## Enroll Admission System
 
-## 改进
-	* 将“屏幕”账户与“引导”账户权限合并，其余各账户权限号不变
-	* 支持同一用户名下的不同权限账户
-	* 优化数据管理体验
-	* 修正了原版“成绩考核”中的bug
+# 仿真模拟系统
 
-## 问题
-### 有辅面试官未打完分也可结束面试
-	* 建议主面在结束面试前确认所有辅面完成评分
-### 未报名成绩会显示在grades里面 
-	* 采用了一种较暴力方法(相关代码以*violence注释标记)解决，以后最好将rates分离为两张表
-### 需在controller's addintogroup 增加回滚保护机制
-	* 已添加必要的回滚保护机制
-### 面试题目等待汪老师确定后添加进screen内
-### 每场面试人数固定（一面5人，二面10人）
-### 部分资料链接需要等报名系统域名确定
-### 管理员界面显示数据的易读性应当提高
-### 引导界面无法自动刷新
+配置好系统后，可以在管理员界面的 **状态管理** 设置初号机（一面仿真）启动
 
-## 部署说明
-	本系统没有自动初始化程序，需手动配置
+之后在 **全局不可逆控制** 开始 以中文基准神经连接
 
-	**配置数据库**
+后续代码继续跟进中，目前可以模拟到一面结束（尚不能出成绩）
 
-	mysql> source database.sql
+### 部署说明
+- 初始化系统
 
-	**修改MySQL数据库登录配置**
+    本系统没有自动初始化程序，需手动配置
 
-	*[EAS PATH]/Application/Home/Conf/config.php* 中修改对应配置
+    **配置数据库**
 
-	**手动设置初始配置**
+    mysql> source database.sql
+
+    **修改MySQL数据库登录配置**
+
+    *[EAS PATH]/Application/Home/Conf/config.php* 中修改对应配置
+
+    将 *M('', 'enroll2015_application', '');* 全部替换为 *M('enroll2015_application');* 即可； 这一代码仅在**IndexController.php**中出现
+
+    **手动设置初始配置**
 
         设置 STATUS_ROUND表 中当前面试的进度为 1
         INSERT INTO status_round VALUES(1, 1);
@@ -40,7 +33,19 @@
 
     **各字段值** 对应参阅 enroll_admission_db_segment_def.md
 
-## 其他说明
+    **问题列表** 对应参阅 issue.md
+
+<br />
+
+- 2015-2016 Fall/Winter 配置说明(可在管理界面手动配置)
+
+    **Sectors表**
+
+    	1 - 电视台 - television
+    	2 - 广播台 - radio
+    	3 - 校报社 - newspaper
+
+### 其他说明
 - 正式流水号生成规则
 
 	**SerialNumber Rule: YYYY--M---stMDudenDH--HItn---u--mISS----**
@@ -49,4 +54,4 @@
 		YYYY-M-MD-DH-HI-ISS			//2015-0-81-01-21-010
 
 		//$stuId = "studentnum";
-		st-uden-tn-u-m				//31-3000-07-3-8
+    	st-uden-tn-u-m				//31-3000-07-3-8
