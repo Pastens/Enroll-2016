@@ -26,12 +26,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
+                <a class="navbar-brand">面试考核系统</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="{$profile_url}">个人页面</a></li>
-                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="{$logout_url}">登出</a></li>
                 </ul>
@@ -48,11 +45,9 @@
                 </ul>
                 <ul class="nav nav-sidebar">
                     <li><a href="#USER">用户管理</a></li>
-                    <li><a href="#SECTOR">部门管理</a></li>
                     <li><a href="#STATUS">状态管理</a></li>
                     <li><a href="#TIME">考核时间管理</a></li>
                     <li><a href="#ROOM">考核地点管理</a></li>
-                    <li><a href="#TAGSMETA">考核Tags管理</a></li>
                 </ul>
                 <ul class="nav nav-sidebar">
                     <li><a href="#INTERVIEWEE">考核人员管理</a></li>
@@ -116,18 +111,6 @@
                             </th>
                             <th>
                                 <form action="{$dangerctl_url}" method="post">
-                                    <input type="hidden" name="request" value="simuEnroll">
-                                    <button class="btn btn-m btn-warning">以中文基准神经连接</button>
-                                </form>
-                            </th>
-                            <th>
-                                <form action="{$dangerctl_url}" method="post">
-                                    <input type="hidden" name="request" value="dropSimuEnroll">
-                                    <button class="btn btn-m btn-warning">丢弃安全装置信息</button>
-                                </form>
-                            </th>
-                            <th>
-                                <form action="{$dangerctl_url}" method="post">
                                     <input type="hidden" name="request" value="confirmGrades">
                                     <button class="btn btn-m btn-success">确认全部面试成绩</button>
                                 </form>
@@ -162,38 +145,36 @@
                                     <th>{$u.email}</th>
                                     <th>
                                         <?php
-                            foreach ($fetchSector as $f) {
-                                if($f['sid'] == $u['sector']){
-                                    echo $f['description'];
-                                    break;
-                                }
-                            }
-                          ?>
+                                        switch($u['sector']){
+                                            case 1:
+                                                echo '电视台';
+                                                break;
+                                            case 2:
+                                                echo '广播台';
+                                                break;
+                                            }
+                                        ?>
                                     </th>
                                     <th>
                                         <?php
                             switch($u['authority']){
                                 case 16:
-                                    echo '系统管理员';
+                                    echo '管理员';
                                     break;
                                 case 1:
-                                    echo '检录工作人员';
-                                    break;
-                                case 2:
-                                    echo '引导工作人员';
+                                    echo '检录员';
                                     break;
                                 case 3:
-                                    echo '屏幕展示';
+                                    echo '引导员';
                                     break;
                                 case 4:
-                                    echo '副面试人员';
+                                    echo '辅面试官';
                                     break;
                                 case 8:
-                                    echo '主面试人员';
+                                    echo '主面试官';
                                     break;
                             }
                           ?>
-                                            - {$u.authority}
                                     </th>
                                     <th>
                                         <form action="{$management_url}" method="post">
@@ -220,72 +201,32 @@
                                         <input type="email" name="email" class="form-control" required="">
                                     </th>
                                     <th>
-                                        <input type="text" name="sector" class="form-control" required="">
+                                        <select name="sector" class="form-control" required="">
+                                            <option value=1 selected="selected">电视台</option>
+                                            <option value=2>广播台</option>
+                                        </select>                                    
                                     </th>
                                     <th>
-                                        <input type="text" name="authority" class="form-control" required="">
+                                        <select name="authority" class="form-control" required="">
+                                            <option value=1 selected="">检录员</option>
+                                            <option value=3>引导员</option>
+                                            <option value=4>辅面试官</option>
+                                            <option value=8>主面试官</option>
+                                            <option value=16>管理员</option>
+                                        </select>
                                     </th>
                                     <th>
                                         <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
                                     </th>
                                 </form>
 
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <a name="SECTOR"></a>
-                <h1># 2</h1>
-                <h2 class="sub-header">部门管理</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>部门描述</th>
-                                <th>表单命名</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <volist name="fetchSector" id="s">
-                                <tr>
-                                    <th>{$s.sid}</th>
-                                    <th>{$s.description}</th>
-                                    <th>{$s.naming}</th>
-                                    <th>
-                                        <form action="{$management_url}" method="post">
-                                            <input type="hidden" name="request" value="delete">
-                                            <input type="hidden" name="target" value="SECTOR">
-                                            <input type="hidden" name="sid" value="{$s.sid}">
-                                            <button class="btn btn-xs btn-danger btn-block" type="submit">DEL</button>
-                                        </form>
-                                    </th>
-                                </tr>
-                            </volist>
-                            <tr>
-                                <form action="{$management_url}" method="post">
-                                    <input type="hidden" name="request" value="insert">
-                                    <input type="hidden" name="target" value="SECTOR">
-                                    <th></th>
-                                    <th>
-                                        <input type="text" name="description" class="form-control" required="">
-                                    </th>
-                                    <th>
-                                        <input type="text" name="naming" class="form-control" required="">
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
-                                    </th>
-                                </form>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <a name="STATUS"></a>
-                <h1># 3</h1>
+                <h1># 2</h1>
                 <h2 class="sub-header">状态管理</h2>
                 <div class="table-responsive">
                     <table class="table table-striped">
@@ -307,7 +248,7 @@
                                         <input type="hidden" name="request" value="update">
                                         <input type="hidden" name="target" value="STATUS">
                                         <input type="hidden" name="value" value="1">
-                                        <button class="btn btn-xs btn-warning btn-block" type="submit">等待</button>
+                                        <button class="btn btn-xs btn-success btn-block" type="submit">等待</button>
                                     </form>
                                 </th>
                                 <th>
@@ -331,87 +272,17 @@
                                         <input type="hidden" name="request" value="update">
                                         <input type="hidden" name="target" value="STATUS">
                                         <input type="hidden" name="value" value="14">
-                                        <button class="btn btn-xs btn-warning btn-block" type="submit">结束</button>
-                                    </form>
-                                </th>
-                                <th>
-                                    <form action="{$management_url}" method="post">
-                                        <input type="hidden" name="request" value="update">
-                                        <input type="hidden" name="target" value="STATUS">
-                                        <input type="hidden" name="value" value="254">
-                                        <button class="btn btn-xs btn-danger btn-block" type="submit">零号机</button>
-                                    </form>
-                                </th>
-                                <th>
-                                    <form action="{$management_url}" method="post">
-                                        <input type="hidden" name="request" value="update">
-                                        <input type="hidden" name="target" value="STATUS">
-                                        <input type="hidden" name="value" value="255">
-                                        <button class="btn btn-xs btn-danger btn-block" type="submit">初号机</button>
+                                        <button class="btn btn-xs btn-danger btn-block" type="submit">结束</button>
                                     </form>
                                 </th>
                             </tr>
 
-                        </tbody>
-                    </table>
-                </div>
-
-                <a name="TIME"></a>
-                <h1># 4</h1>
-                <h2 class="sub-header">考核时间管理</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>考核日期</th>
-                                <th>考核时刻</th>
-                                <th>描述</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <volist name="fetchTime" id="t">
-                                <tr>
-                                    <th>{$t.tid}</th>
-                                    <th>{$t.datespec}</th>
-                                    <th>{$t.timespec}</th>
-                                    <th>{$t.description}</th>
-                                    <th>
-                                        <form action="{$management_url}" method="post">
-                                            <input type="hidden" name="request" value="delete">
-                                            <input type="hidden" name="target" value="TIME">
-                                            <input type="hidden" name="tid" value="{$t.tid}">
-                                            <button class="btn btn-xs btn-danger btn-block" type="submit">DEL</button>
-                                        </form>
-                                    </th>
-                                </tr>
-                            </volist>
-                            <tr>
-                                <form action="{$management_url}" method="post">
-                                    <input type="hidden" name="request" value="insert">
-                                    <input type="hidden" name="target" value="TIME">
-                                    <th></th>
-                                    <th>
-                                        <input type="text" name="datespec" class="form-control" required="">
-                                    </th>
-                                    <th>
-                                        <input type="text" name="timespec" class="form-control" required="">
-                                    </th>
-                                    <th>
-                                        <input type="text" name="description" class="form-control" required="">
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
-                                    </th>
-                                </form>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
 
                 <a name="ROOM"></a>
-                <h1># 5</h1>
+                <h1># 3</h1>
                 <h2 class="sub-header">考核地点管理</h2>
                 <div class="table-responsive">
                     <table class="table table-striped">
@@ -419,24 +290,12 @@
                             <tr>
                                 <th>#</th>
                                 <th>考点</th>
-                                <th>状态</th>
-                                <th>部门</th>
-                                <th>GID</th>
-                                <th>开放</th>
-                                <th>C1</th>
-                                <th>S1</th>
-                                <th>S2</th>
-                                <th>S3</th>
-                                <th>S4</th>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <th>S5</th>
-                                <th>S6</th>
-                                <th>S7</th>
-                                <th>S8</th>
-                                <th>S9</th>
-                                <th>S10</th>
+                                <th>组别</th>
+                                <th>主面</th>
+                                <th>辅一</th>
+                                <th>辅二</th>
+                                <th>辅三</th>
+                                <th>辅四</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -445,24 +304,12 @@
                                 <tr>
                                     <th>{$r.rid}</th>
                                     <th>{$r.roomnumber}</th>
-                                    <th>{$r.roomstatus}</th>
-                                    <th>{$r.sector}</th>
                                     <th>{$r.gid}</th>
-                                    <th>{$r.susr_count}</th>
                                     <th>{$r.suid_core}</th>
                                     <th>{$r.suid1}</th>
                                     <th>{$r.suid2}</th>
                                     <th>{$r.suid3}</th>
                                     <th>{$r.suid4}</th>
-                                </tr>
-                                <tr>
-                                    <th></th>
-                                    <th>{$r.suid5}</th>
-                                    <th>{$r.suid6}</th>
-                                    <th>{$r.suid7}</th>
-                                    <th>{$r.suid8}</th>
-                                    <th>{$r.suid9}</th>
-                                    <th>{$r.suid10}</th>
                                     <th>
                                         <form action="{$management_url}" method="post">
                                             <input type="hidden" name="request" value="delete">
@@ -482,51 +329,27 @@
                                     <th>
                                         <input type="text" name="roomnumber" class="form-control" required="">
                                     </th>
-                                    <th></th>
                                     <th>
-                                        <input type="text" name="sector" class="form-control" required="">
+                                        <button class="btn btn-block disabled="" ">自动分配</button>
                                     </th>
-                                    <th></th>
-                                    <th></th>
                                     <th>
                                         <input type="text" name="suid_core" class="form-control" required="">
                                     </th>
                                     <th>
-                                        <input type="text" name="suid1" class="form-control" required="">
+                                        <input type="text" name="suid1" class="form-control" >
                                     </th>
                                     <th>
-                                        <input type="text" name="suid2" class="form-control" required="">
+                                        <input type="text" name="suid2" class="form-control" >
                                     </th>
                                     <th>
-                                        <input type="text" name="suid3" class="form-control" required="">
+                                        <input type="text" name="suid3" class="form-control" >
                                     </th>
                                     <th>
-                                        <input type="text" name="suid4" class="form-control" required="">
+                                        <input type="text" name="suid4" class="form-control" >
                                     </th>
-                                </tr>
-                                <tr></tr>
-                                <th></th>
-                                <th>
-                                    <input type="text" name="suid5" class="form-control" required="">
-                                </th>
-                                <th>
-                                    <input type="text" name="suid6" class="form-control" required="">
-                                </th>
-                                <th>
-                                    <input type="text" name="suid7" class="form-control" required="">
-                                </th>
-                                <th>
-                                    <input type="text" name="suid8" class="form-control" required="">
-                                </th>
-                                <th>
-                                    <input type="text" name="suid9" class="form-control" required="">
-                                </th>
-                                <th>
-                                    <input type="text" name="suid10" class="form-control" required="">
-                                </th>
-                                <th>
-                                    <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
-                                </th>
+                                    <th>
+                                        <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
+                                    </th>
                                 </tr>
                             </form>
 
@@ -534,121 +357,8 @@
                     </table>
                 </div>
 
-                <a name="TAGSMETA"></a>
-                <h1># 6</h1>
-                <h2 class="sub-header">考核Tags管理</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Tags描述</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <volist name="fetchTagsmeta" id="t">
-                                <tr>
-                                    <th>{$t.tagid}</th>
-                                    <th>{$t.description}</th>
-                                    <th>
-                                        <form action="{$management_url}" method="post">
-                                            <input type="hidden" name="request" value="delete">
-                                            <input type="hidden" name="target" value="TAGSMETA">
-                                            <input type="hidden" name="tagid" value="{$t.tagid}">
-                                            <button class="btn btn-xs btn-danger btn-block" type="submit">DEL</button>
-                                        </form>
-                                    </th>
-                                </tr>
-                            </volist>
-                            <tr>
-                                <form action="{$management_url}" method="post">
-                                    <input type="hidden" name="request" value="insert">
-                                    <input type="hidden" name="target" value="TAGSMETA">
-                                    <th></th>
-                                    <th>
-                                        <input type="text" name="description" class="form-control" required="">
-                                    </th>
-                                    <th>
-                                        <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
-                                    </th>
-                                </form>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <a name="INTERVIEWEE"></a>
-                <h1># 7</h1>
-                <h2 class="sub-header">考核人员管理</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>学号</th>
-                                <th>姓名</th>
-                                <th>状态</th>
-                                <th>SN</th>
-                                <th>转换</th>
-                                <th>操作</th>
-                            </tr>
-                            <tr>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th></th>
-                                <th>
-                                    <form action="{$transfer_url}" method="post">
-                                        <input type="hidden" name="request" value="transfer">
-                                        <input type="hidden" name="studentid" value="all">
-                                        <button class="btn btn-xs btn-primary">全部转换</button>
-                                    </form>
-                                </th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <volist name="fetchEnroll" id="e">
-                                <tr>
-                                    <th>{$e.studentid}</th>
-                                    <th>{$e.studentname}</th>
-                                    <?php
-                                for($i = 0; $i < count($fetchInterviewee); $i++) {
-                                    if($fetchInterviewee[$i]['studentid'] === $e['studentid']){
-                                        echo '<th>' . $fetchInterviewee[$i]['status'] . '</th>';
-                                        echo '<th>' . $fetchInterviewee[$i]['serialnumber'] . '</th>';
-                                        echo '<th>' . '</th>';
-                                        echo '<th>';
-                                        echo '<form action="' . $transfer_url . '" method="post">';
-                                        echo '<input type="hidden" name="request" value="remove">';
-                                        echo '<input type="hidden" name="studentid" value="' . $e['studentid'] . '">';
-                                        echo '<button class="btn btn-xs btn-danger">强制移除</button>';
-                                        echo '</form>';
-                                        echo '</th>';
-                                        break;
-                                    }
-                                }
-                                if($i == count($fetchInterviewee)) {
-                                    echo '<th>未转换</th>';
-                                    echo '<th>未转换</th>';
-                                    echo '<th>';
-                                    echo '<form action="' . $transfer_url . '" method="post">';
-                                    echo '<input type="hidden" name="request" value="transfer">';
-                                    echo '<input type="hidden" name="studentid" value="' . $e['studentid'] . '">';
-                                    echo '<button class="btn btn-xs btn-primary">转换</button>';
-                                    echo '</form>';
-                                    echo '</th>';
-                                    echo '<th>' . '</th>';
-                                }
-                        ?>
-                                </tr>
-                            </volist>
-                        </tbody>
-                    </table>
-                </div>
-
                 <a name="GROUP"></a>
-                <h1># 8</h1>
+                <h1># 4</h1>
                 <h2 class="sub-header">分组清单</h2>
                 <div class="table-responsive">
                     <table class="table table-striped">

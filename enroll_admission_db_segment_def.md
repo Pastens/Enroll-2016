@@ -10,9 +10,8 @@
 - authority		***int***
 	- 0x00 Unknown  
     - 0x01 检录
-	- 0x02 引导
-	- 0x03 屏幕
-	- 0x04 面试官
+	- 0x03 引导
+	- 0x04 辅面试官
 	- 0x08 主面试官
 	- 0x10 管理员
 
@@ -25,8 +24,6 @@
 	- 0x02 第一轮面试
 	- 0x06 第二轮面试
 	- 0x0E 面试结束
-	- 0xFE 仿真模拟系统(254)
-	- 0xFF 仿真模拟系统(255)
 
 ## Interviewees
 - studentId		***varchar***
@@ -47,14 +44,9 @@
 - time2tid		***int***
 - checkInTime	***varchar(255)***
 - multiSector	***int***
-	- 0x00 Unknown  0~7 二进制从低位到高位依次表示 电视台、广播台、校报社
+	- 0x00 Unknown  二进制从低位到高位依次表示 电视台、广播台
 	- 0x01 电视台
 	- 0x02 广播台
-	- 0x03 电视台 广播台
-	- 0x04 校报社
-	- 0x05 电视台 校报社
-	- 0x06 广播台 校报社
-	- 0x07 电视台 广播台 校报社
 
 ## Rates
 - studentId		***int***
@@ -62,7 +54,18 @@
 - uid			***int***
 - round			***int***
 - sector		***int***
-- rating		***int*** *# 5-Rate*
+- t_status		***int***
+	- 0x00 未考核, 未报名
+	- 0x01 未考核, 已报名
+	- 0x02 已考核, 未报名
+	- 0x03 已考核, 已报名
+- r_status		***int***
+	- 0x00 未考核, 未报名
+	- 0x01 未考核, 已报名
+	- 0x02 已考核, 未报名
+	- 0x03 已考核, 已报名
+- t_rates_0~4	***int*** *# 10-Rate*
+- r_rates_0~4	***int*** *# 10-Rate*
 
 ## Comments
 - studentId		***int***
@@ -71,18 +74,6 @@
 - round			***int***
 - sector		***int***
 - comments		***varchar(255)***
-
-## Tags
-- studentId		***int***
-- serialNumber	***varchar(255)***
-- uid			***int***
-- round			***int***
-- sector		***int***
-- tags			***varchar(255)***
-
-## Tags_meta	记录元标签
-- tagid			***int***
-- description	***varchar(255)***
 
 ## Rooms
 - rid			***int***
@@ -98,11 +89,17 @@
 - suid_core		***int***
 	主面试官
 - suid			***int***
-	最多允许12+1位面试官分配在同一房间
+	最多允许4+1位面试官分配在同一房间
 
 ## Groups
 - gid			***int***
 - round			***int***
+- status        ***int***
+	- 0x00 Unknown
+	- 0x01 等待，准备面试问题
+	- 0x02 正在面试
+	- 0x03 面试结束
+- member_cnt	***int***
 - member_sn		***varchar(255)***
 	最多允许10位面试者分配在同一组别
 
@@ -112,57 +109,8 @@
 - timeSpec		***varchar(255)***
 - description	***varchar(255)***
 
-## Sectors
-- sid			***int***
-- description	***varchar(255)***
-
 ## Waiting_List
 - studentId		***int***
 - serialNumber	***varchar(255)***
-- status		***int***
-	- 0x00 Unknown
-	- 0x01 空闲，可以分配面试
-	- 0x02 锁定，不可以分配面试
-
----
-
-# 未使用的表
-
-## Logs
-- lid			***int***
-- uid 			***int*** *# relevant user*
-- request		***varchar(255)*** *# system request(login logout..)*
-- date			***varchar(255)***
-- time			***varchar(255)***
-
-CREATE TABLE IF NOT EXISTS logs(
-	lid int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	uid int NOT NULL,
-	request varchar(255) NOT NULL,
-	date varchar(255) NOT NULL,
-	time varchar(255) NOT NULL
-);
-
-## Interviews
-- iid			***int*** *# Auto Increcement*
-- rid			***int***
 - sector		***int***
-- date			***varchar(255)***
-- beginTime		***varchar(255)***
-- stopTime		***varchar(255)***
 
-CREATE TABLE IF NOT EXISTS interviews(
-	iid int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	rid int NOT NULL,
-	sector int NOT NULL,
-	date varchar(255) NOT NULL,
-	beginTime varchar(255) NOT NULL,
-	stopTime varchar(255) NOT NULL
-);
-
-## Settings
-CREATE TABLE IF NOT EXISTS settings(
-	id int NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	key varchar(100) NOT NULL,
-	val varchar(100) NOT NULL
-);
