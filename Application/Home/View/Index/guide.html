@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>ZJUBTV 面试考核系统</title>
+    <!-- Bootstrap core CSS -->
+    <css href="__PUBLIC__/css/bootstrap.min.css" />
+    <!-- Custom CSS-->
+    <css href="__PUBLIC__/css/list.css" />
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="{$profile_url}">个人页面</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{$logout_url}">登出</a></li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="starter-template">
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <volist name="fetchRoom" id="r">
+                                <th>
+                                    <?php
+                                        $Sector = M('sectors');
+                                        $fetchSector = $Sector->where('sid = ' . $r['sector'])->find();
+                                        echo $fetchSector['description'];
+                                    ?>
+                                </th>
+                                <th>{$r.roomnumber}</th>
+                                <th></th>
+                            </volist>
+                        </tr>
+                        <tr>
+                            <volist name="fetchRoom" id="r">
+                                <th>
+                                    <?php
+                                        switch ($r['roomstatus']) {
+                                            case 0:
+                                                echo '<h4><span class="label label-warning">未知</span></h4>';
+                                                break;
+                                            case 1:
+                                                echo '<h4><span class="label label-success">等待</span></h4>';
+                                                break;
+                                            case 2:
+                                                echo '<h4><span class="label label-danger">面试</span></h4>';
+                                                break;
+                                        }
+                                    ?>
+                                </th>
+                                <th>
+                                    <form action="{$setGroup_url}" method="post">
+                                        <input type="hidden" name="rid" value="{$r['rid']}">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_1" name="sn1" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_2" name="sn2" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_3" name="sn3" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_4" name="sn4" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_5" name="sn5" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_6" name="sn6" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_7" name="sn7" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_8" name="sn8" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_9" name="sn9" value="">
+                                        <input type="hidden" id="input_postSN-rid_{$r['rid']}_lineId_10" name="sn10" value="">
+                                        <button class="btn btn-xs btn-warning btn-block" type="submit">确认分配</button>
+                                    </form>
+                                    <?php
+                                        if($fetchRound['round'] == 2 || $fetchRound['round'] == 254){
+                                            echo '<button class="btn btn-xs btn-success btn-block" onclick="autoInList(this, 5)"';
+                                            echo ' rid="' . $r['rid'] . '" sid="' . $r['sector'] . '">自动填单</button>';
+                                        }
+                                        if($fetchRound['round'] == 6 || $fetchRound['round'] == 255){
+                                            echo '<button class="btn btn-xs btn-success btn-block" onclick="autoInList(this, 10)"';
+                                            echo ' rid="' . $r['rid'] . '" sid="' . $r['sector'] . '">自动填单</button>';
+                                        }
+                                    ?>
+                                </th>
+                                <th></th>
+                            </volist>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            //$R = M('status_round');
+                            //$curRound = $R->find();
+                            //if($curRound['round'] == 2 || $curRound['round'] == 254) $maxLine = 5;
+                            //if($curRound['round'] == 6 || $curRound['round'] == 255) $maxLine = 10;
+
+                            $maxLine = 10;
+
+                            for($i = 1; $i <= $maxLine; $i++){
+                                echo '<tr>';
+                                    for($j = 0; $j < $countRoom; $j++){
+                                        echo '<th id="th_promptInfoList-rid_' . $fetchRoom[$j]['rid'] . '_lineId_' . $i . '">' . $i . '</th>';
+                                        echo '<th></th><th></th>';
+                                    }
+                                echo '</tr>';
+                            }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>待分配队列</h2>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>电视台</th>
+                            <th></th>
+                            <th></th>
+                            <th>广播台</th>
+                            <th></th>
+                            <th></th>
+                            <th>校报社</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            for($i=1; $i<=$maxrec; $i++){
+                                echo '<tr>';
+                                if($twl[$i-1] != NULL){
+                                    $sn = $twl[$i-1]['serialnumber'];
+                                    $sd = $twl[$i-1]['serialdigit'];
+                                    $stuid = $twl[$i-1]['studentid'];
+                                    $stuStatus = $twl[$i-1]['status'];
+                                    $targetSectorId = 1;
+
+                                    $Round = M('status_round');
+                                    $limitRound = $Round->find();
+                                    if($limitRound['round'] == 2 || $limitRound['round'] == 6){
+                                        $Enroll = M('', 'enroll2015_application', '');
+                                    }
+                                    // Simu Enroll
+                                    if($limitRound['round'] == 254 || $limitRound['round'] == 255) {
+                                        $Enroll = M('simu_enroll');
+                                    }
+
+                                    $modifier = '';
+                                    $tarEnroll = $Enroll->where('studentid = ' . $stuid)->find();
+                                    for($liX = 1; $liX <=5; $liX++){
+                                        if(substr($tarEnroll['job' . $liX], 0, 1) == 'C'){
+                                            $modifier = '(C)';
+                                            break;
+                                        }
+                                    }
+
+                                    echo '<th id="th_queuedList-sid_' . $targetSectorId . '_lineId_' . $i . '" status="' . $stuStatus . '">' . $enrollMap[$stuid] . $modifier . ' - ' . $stuid . '</th>';
+                                    echo '<th id="th_queuedStatus-SN_' . $sn . '_sid_' . $targetSectorId . '" inqueuestatus="0">' . $sd . ' - ' . substr($sn, 36, 4) . '</th>';
+
+                                    echo '<th>';
+                                    switch ($stuStatus){
+                                        case 0:
+                                            echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                            break;
+                                        case 1:
+                                            for($j=0; $j<$countRoom; $j++){
+                                                if($fetchRoom[$j]['sector'] == $targetSectorId){
+                                                    echo '<button id="button_queuedStatus-SN_' . $sn . '_sid_' . $targetSectorId . '_rid_' . $fetchRoom[$j]['rid'] . '" onclick="inList(this)" class="btn btn-xs btn-success btn-block"';
+                                                    echo ' rid="' . $fetchRoom[$j]['rid'] . '" sid="' . $fetchRoom[$j]['sector'] . '"';
+                                                    echo ' stuname="' . $enrollMap[$stuid] . $modifier . '" stuid="' . $stuid . '" sd="' . $sd . '" sn="' . $sn . '">';
+                                                    echo $fetchRoom[$j]['roomnumber'] . '</button>';
+                                                }
+                                            }
+                                            break;
+                                        case 2:
+                                            echo '<button class="btn btn-xs btn-danger btn-block">面试</button>';
+                                            break;
+                                    }
+                                    echo '</th>';
+                                }else{
+                                    echo '<th></th><th></th><th></th>';
+                                }
+
+                                if($rwl[$i-1] != NULL){
+                                    $sn = $rwl[$i-1]['serialnumber'];
+                                    $sd = $rwl[$i-1]['serialdigit'];
+                                    $stuid = $rwl[$i-1]['studentid'];
+                                    $stuStatus = $rwl[$i-1]['status'];
+                                    $targetSectorId = 2;
+
+                                    $Round = M('status_round');
+                                    $limitRound = $Round->find();
+                                    if($limitRound['round'] == 2 || $limitRound['round'] == 6){
+                                        $Enroll = M('', 'enroll2015_application', '');
+                                    }
+                                    // Simu Enroll
+                                    if($limitRound['round'] == 254 || $limitRound['round'] == 255) {
+                                        $Enroll = M('simu_enroll');
+                                    }
+
+                                    $modifier = '(';
+                                    $tarEnroll = $Enroll->where('studentid = ' . $stuid)->find();
+                                    for($liX = 1; $liX <=5; $liX++){
+                                        if(substr($tarEnroll['job' . $liX], 0, 1) == 'A'){
+                                            $modifier = $modifier . substr($tarEnroll['job' . $liX], 1, 1);
+                                        }
+                                    }
+                                    $modifier = $modifier . ')';
+
+                                    echo '<th id="th_queuedList-sid_' . $targetSectorId . '_lineId_' . $i . '" status="' . $stuStatus . '">' . $enrollMap[$stuid] . $modifier . ' - ' . $stuid . '</th>';
+                                    echo '<th id="th_queuedStatus-SN_' . $sn . '_sid_' . $targetSectorId . '" inqueuestatus="0">' . $sd . ' - ' . substr($sn, 36, 4) . '</th>';
+
+                                    echo '<th>';
+                                    switch ($stuStatus){
+                                        case 0:
+                                            echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                            break;
+                                        case 1:
+                                            for($j=0; $j<$countRoom; $j++){
+                                                if($fetchRoom[$j]['sector'] == $targetSectorId){
+                                                    echo '<button id="button_queuedStatus-SN_' . $sn . '_sid_' . $targetSectorId . '_rid_' . $fetchRoom[$j]['rid'] . '" onclick="inList(this)" class="btn btn-xs btn-success btn-block"';
+                                                    echo ' rid="' . $fetchRoom[$j]['rid'] . '" sid="' . $fetchRoom[$j]['sector'] . '"';
+                                                    echo ' stuname="' . $enrollMap[$stuid] . $modifier . '" stuid="' . $stuid . '" sd="' . $sd . '" sn="' . $sn . '">';
+                                                    echo $fetchRoom[$j]['roomnumber'] . '</button>';
+                                                }
+                                            }
+                                            break;
+                                        case 2:
+                                            echo '<button class="btn btn-xs btn-danger btn-block">面试</button>';
+                                            break;
+                                    }
+                                    echo '</th>';
+                                }else{
+                                    echo '<th></th><th></th><th></th>';
+                                }
+
+                                if($nwl[$i-1] != NULL){
+                                    $sn = $nwl[$i-1]['serialnumber'];
+                                    $sd = $nwl[$i-1]['serialdigit'];
+                                    $stuid = $nwl[$i-1]['studentid'];
+                                    $stuStatus = $nwl[$i-1]['status'];
+                                    $targetSectorId = 3;
+
+                                    echo '<th id="th_queuedList-sid_' . $targetSectorId . '_lineId_' . $i . '" status="' . $stuStatus . '">' . $enrollMap[$stuid] . ' - ' . $stuid . '</th>';
+                                    echo '<th id="th_queuedStatus-SN_' . $sn . '_sid_' . $targetSectorId . '" inqueuestatus="0">' . $sd . ' - ' . substr($sn, 36, 4) . '</th>';
+
+                                    echo '<th>';
+                                        //dump($stuStatus);
+                                    switch ($stuStatus){
+                                        case '0':
+                                            echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                            break;
+                                        case '1':
+                                            for($j=0; $j<$countRoom; $j++){
+                                                if($fetchRoom[$j]['sector'] == $targetSectorId){
+                                                    echo '<button id="button_queuedStatus-SN_' . $sn . '_sid_' . $targetSectorId . '_rid_' . $fetchRoom[$j]['rid'] . '" onclick="inList(this)" class="btn btn-xs btn-success btn-block"';
+                                                    echo ' rid="' . $fetchRoom[$j]['rid'] . '" sid="' . $fetchRoom[$j]['sector'] . '"';
+                                                    echo ' stuname="' . $enrollMap[$stuid] . '" stuid="' . $stuid . '" sd="' . $sd . '" sn="' . $sn . '">';
+                                                    echo $fetchRoom[$j]['roomnumber'] . '</button>';
+                                                }
+                                            }
+                                            break;
+                                        case '2':
+                                            echo '<button class="btn btn-xs btn-danger btn-block">面试</button>';
+                                            break;
+                                        default:
+                                            echo $stuStatus;
+                                            break;
+                                    }
+                                    echo '</th>';
+                                }else{
+                                    echo '<th></th><th></th><th></th>';
+                                }
+
+                                echo '</tr>';
+                            }
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+            <!--        <script src="//cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>-->
+            <js href="__PUBLIC__/js/jquery-1.11.3.min.js" />
+            <!-- Include all compiled plugins (below), or include individual files as needed -->
+            <js href="__PUBLIC__/js/bootstrap.min.js" />
+
+            <script>
+                function inList(obj) {
+                    var sn = obj.getAttribute('sn');
+                    var sd = obj.getAttribute('sd');
+                    var stuName = obj.getAttribute('stuname');
+                    var stuId = obj.getAttribute('stuid');
+                    var rid = obj.getAttribute('rid');
+                    var sid = obj.getAttribute('sid');
+
+                    // Check whether is in List
+                    var inQueueElement = document.getElementById('th_queuedStatus-SN_' + sn + '_sid_' + sid);
+                    var inQueue = inQueueElement.getAttribute('inqueuestatus');
+                    if(inQueue === "0") {
+                        // Search suitable place
+                        var formElement = Array();
+                        for(i = 1; i<= 10; i++) {
+                            var formLine = document.getElementById('input_postSN-rid_' + rid + '_lineId_' + i);
+                            if(formLine.getAttribute('value') == ''){
+                                // Insert into hidden form
+                                formLine.setAttribute('value', sn);
+                                // Insert into prompt form
+                                var promptLine = document.getElementById('th_promptInfoList-rid_' + rid + '_lineId_' + i);
+                                promptLine.innerHTML = promptLine.innerHTML + ' ' + sd;
+                                promptLine.nextSibling.innerHTML = stuName;
+                                promptLine.nextSibling.nextSibling.innerHTML = '<button class="btn btn-xs btn-warning btn-block" onclick="outList(this)" sn="' + sn + '" sd="' + sd + '" stuname ="' + stuName + '" stuid="' + stuId + '" rid="' + rid + '" sid ="' + sid + '" lineid="' + i + '">移除</button>';
+                                // Update button's status & set inList flag
+                                obj.setAttribute('class', 'btn btn-xs btn-default btn-block')
+                                inQueueElement.setAttribute('inqueuestatus', "1");
+                                break;
+                            }
+                        }
+                        if(i == 11){ alert('预分配队列已满'); }
+                    }else{
+                        alert('已经入预分配队列');
+                    }
+                }
+
+                function autoInList(obj, count) {
+                  var rid = obj.getAttribute('rid');
+                  var sid = obj.getAttribute('sid');
+
+                  // Get available array
+                  var availableList = Array();
+                  var availableListLineId = Array();
+                  var countList = 0;
+                  var idText = 'th_queuedList-sid_' + sid + '_lineId_';
+                  for(i = 1; document.getElementById(idText + i) != null; i++){
+                      var tmp = document.getElementById(idText + i);
+                      if((tmp.getAttribute('status') == '1' || tmp.getAttribute('status')=='12') && tmp.nextSibling.getAttribute('inqueuestatus') === "0") {
+                        availableList[countList] = tmp.nextSibling;
+                        availableListLineId[countList] = i;
+                        countList++;
+                      }
+                  }
+
+                  // Countdown
+                  if(countList == 0) alert('无可分配的人员');
+                  for(lo = 0; lo < countList; lo++) {
+                      if(lo == count) break;
+                      var sn = availableList[lo].getAttribute('id').substr(19, 40);
+                      var targetButton = 'button_queuedStatus-SN_' + sn + '_sid_' + sid + '_rid_' + rid;
+                      inList(document.getElementById(targetButton));
+                  }
+                }
+
+                function outList(obj) {
+                    var sn = obj.getAttribute('sn');
+                    var sd = obj.getAttribute('sd');
+                    var stuName = obj.getAttribute('stuname');
+                    var stuId = obj.getAttribute('stuid');
+                    var rid = obj.getAttribute('rid');
+                    var sid = obj.getAttribute('sid');
+                    var lineId = obj.getAttribute('lineid');
+
+                    // Remove from hidden form
+                    var formLine = document.getElementById('input_postSN-rid_' + rid + '_lineId_' + lineId);
+                    formLine.setAttribute('value', '');
+                    // Reset from prompt form
+                    var promptLine = document.getElementById('th_promptInfoList-rid_' + rid + '_lineId_' + lineId);
+                    promptLine.innerHTML = promptLine.innerHTML.substr(0, 2).trim();
+                    promptLine.nextSibling.innerHTML = '';
+                    // Update button's status & set inList flag
+                    var buttonElement = document.getElementById('button_queuedStatus-SN_' + sn + '_sid_' + sid + '_rid_' + rid);
+                    buttonElement.setAttribute('class', 'btn btn-xs btn-success btn-block');
+                    var inQueueElement = document.getElementById('th_queuedStatus-SN_' + sn + '_sid_' + sid);
+                    inQueueElement.setAttribute('inqueuestatus', "0");
+                    // Remove self
+                    promptLine.nextSibling.nextSibling.innerHTML = '';
+                }
+            </script>
+
+</body>
+
+</html>

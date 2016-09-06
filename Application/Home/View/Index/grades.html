@@ -25,9 +25,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand">面试考核系统</a>
+          <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="{$profile_url}">个人页面</a></li>
+          </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="{$logout_url}">登出</a></li>
           </ul>
@@ -39,32 +42,34 @@
 
       <div class="starter-template">
           <div class="table-responsive">
-              <h2>电视台成绩队列</h2>
+
+              <!-- <form class="" action="index.html" method="post">
+                  <button type="submit" class="btn btn-m btn-primary btn-block">刷新分组数据</button>
+              </form> -->
+
+              <h2>成绩队列</h2>
               <table class="table table-striped">
                   <thead>
                     <tr>
                       <th>学号</th>
                       <th>姓名</th>
                       <th>性别</th>
-                      <th></th>
-                      <th></th>
+                      <th>联系方式</th>
+                      <th>采纳部门</th>
                       <th>成绩</th>
-                      <th></th>
-                      <th></th>
-                      <th>均分</th>
+                      <th>Tags</th>
                       <th>备注</th>
                       <th>操作</th>
-                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
-                      <volist name="fetchT_rate" id="r">
+                      <volist name="fetchRate" id="r">
                         <tr>
                             <th><a href="https://bbs.zjutv.com/candidates.php?keyword={$r.studentid}" target="_blank">{$r.studentid}</a></th>
-                            <th>{$T_mapToEnroll[$r['serialnumber']]['studentname']}</th>
+                            <th>{$mapToEnroll[$r['serialnumber']]['studentname']}</th>
                             <th>
                                 <?php
-                                    switch ($T_mapToEnroll[$r['serialnumber']]['gender']){
+                                    switch ($mapToEnroll[$r['serialnumber']]['gender']){
                                         case 0:
                                             echo '女';
                                             break;
@@ -74,148 +79,107 @@
                                     }
                                 ?>
                             </th>
-                              <?php
-                                $cnt = 0;
-                                $sumrate = 0;
-                                for($i = 0; $i < 5; $i++) {
-                                  echo '<th>';
-                                  if($r['t_rate_'. $i] == -1) {
-                                    echo '无';
-                                  }
-                                  else{
-                                    $rate = $r['t_rate_'. $i]; 
-                                    $sumrate += $rate;
-                                    $cnt++;
-                                    echo $rate;
-                                  }
-                                  echo '</th>';
-                                }
-
-                                if ($cnt)
-                                  $averate = $sumrate / $cnt;
-                                else
-                                  $averate = 0;
-                                echo '<th>'. $averate. '</th>';
-                              ?>
+                            <th>{$mapToEnroll[$r['serialnumber']]['mobilephone']}/{$mapToEnroll[$r['serialnumber']]['shortphone']}</th>
                             <th>
                                 <?php
-                                    foreach($T_mapToCommen[$r['serialnumber']] as $s_comment){
+                                  switch ($mapToInterv[$r['serialnumber']]['multisector']) {
+                                      case 0:
+                                          echo '未知';
+                                          break;
+                                      case 1:
+                                          echo '电视台';
+                                          break;
+                                      case 2:
+                                          echo '广播台';
+                                          break;
+                                      case 3:
+                                          echo '电视台 广播台';
+                                          break;
+                                      case 4:
+                                          echo '校报社';
+                                          break;
+                                      case 5:
+                                          echo '电视台 校报社';
+                                          break;
+                                      case 6:
+                                          echo '广播台 校报社';
+                                          break;
+                                      case 7:
+                                          echo '电视台 广播台 校报社';
+                                          break;
+                                  }
+                              ?>
+                            </th>
+                            <th>
+                                {$r['rating']}
+                            </th>
+                            <th>
+                                <?php
+                                    $Tagsmeta = M('tags_meta');
+                                    $fetchMeta = $Tagsmeta->select();
+                                    foreach($mapToTag[$r['serialnumber']] as $s_tag){
+                                        $tagid = $s_tag['tags'] - 1;
+                                        echo '<input class="btn btn-xs btn-info" type="submit" value="' . $fetchMeta[$tagid]['description'] . '">';
+                                    }
+                                ?>
+                            </th>
+                            <th>
+                                <?php
+                                    foreach($mapToCommen[$r['serialnumber']] as $s_comment){
                                         echo '<input class="btn btn-xs btn-info" type="submit" value="' . $s_comment['comment'] . '">';
                                     }
                                 ?>
                             </th>
                             <th>
                                 <?php
-                                    if(($session_auth_check & 8) != 8) {
-                                      echo '<button class="btn btn-xs btn-block disabled="" ">无相应权限</button>';
-                                      echo '</th><th>';
-                                    }                                    
-                                    else{
+                                    $User = M('users');
+                                    $fetchUser = $User->where('uid = ' . $_SESSION['login_uid'])->find();
+                                    $loginUserSector = $fetchUser['sector'];
+                                    switch ($loginUserSector) {
+                                        case '1':
+                                            $sectorFlag = 1;
+                                            $sectorNFlag = 6;
+                                            break;
+                                        case '2':
+                                            $sectorFlag = 2;
+                                            $sectorNFlag = 5;
+                                            break;
+                                        case '3':
+                                            $sectorFlag = 4;
+                                            $sectorNFlag = 3;
+                                            break;
+                                        default:
+                                            $sectorFlag = 0;
+                                            $sectorNFlag = 7;
+                                            break;
+                                    }
+
+                                    $originSector = $mapToInterv[$r['serialnumber']]['multisector'];
+
+                                    //if(($originSector & $sectorFlag) == $sectorFlag)
+
+                                    if($fetchRound['round'] == 2 || $fetchRound['round'] == 254) {
                                         echo '<form action="' . $admission_url . '" method="post">';
                                         echo '<input type="hidden" name="sn" value="' . $r['serialnumber'] . '">';
-                                        echo '<input type="hidden" name="request" value="getIn">';
-                                        echo '<input type="hidden" name="sector" value=1>';
-                                        echo '<button class="btn btn-xs btn-success btn-block" type="submit">该轮面试通过</button>';
-                                        echo '</form></th>';
-                                        
-                                        echo '<th>';
-                                        echo '<form action="' . $admission_url . '" method="post">';
-                                        echo '<input type="hidden" name="sn" value="' . $r['serialnumber'] . '">';
-                                        echo '<input type="hidden" name="request" value="getOut">';
-                                        echo '<input type="hidden" name="sector" value=1>';
-                                        echo '<button class="btn btn-xs btn-danger btn-block" type="submit">不予录取</button>';
+                                        if(($originSector & $sectorFlag) == $sectorFlag){
+                                            echo '<input type="hidden" name="request" value="getOut">';
+                                            echo '<button class="btn btn-xs btn-success btn-block" type="submit">二面</button>';
+                                        }else{
+                                            echo '<input type="hidden" name="request" value="getIn">';
+                                            echo '<button class="btn btn-xs btn-danger btn-block" type="submit">未入二面</button>';
+                                        }
                                         echo '</form>';
                                     }
-                                ?>
-                            </th>
-                        </tr>
-                      </volist>
-                  </tbody>
-                </table>
-              <h2>广播台成绩队列</h2>
-              <table class="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>学号</th>
-                      <th>姓名</th>
-                      <th>性别</th>
-                      <th></th>
-                      <th></th>
-                      <th>成绩</th>
-                      <th></th>
-                      <th></th>
-                      <th>均分</th>
-                      <th>备注</th>
-                      <th>操作</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                      <volist name="fetchR_rate" id="r">
-                        <tr>
-                            <th><a href="https://bbs.zjutv.com/candidates.php?keyword={$r.studentid}" target="_blank">{$r.studentid}</a></th>
-                            <th>{$R_mapToEnroll[$r['serialnumber']]['studentname']}</th>
-                            <th>
-                                <?php
-                                    switch ($R_mapToEnroll[$r['serialnumber']]['gender']){
-                                        case 0:
-                                            echo '女';
-                                            break;
-                                        case 1:
-                                            echo '男';
-                                            break;
-                                    }
-                                ?>
-                            </th>
-                              <?php
-                                $cnt = 0;
-                                $sumrate = 0;
-                                for($i = 0; $i < 5; $i++) {
-                                  echo '<th>';
-                                  if($r['r_rate_'. $i] == -1) {
-                                    echo '无';
-                                  }
-                                  else {
-                                    $rate = $r['r_rate_'. $i]; 
-                                    $sumrate += $rate;
-                                    $cnt++;
-                                    echo $rate;
-                                  }
-                                  echo '</th>';
-                                }
-
-                                if ($cnt)
-                                  $averate = $sumrate / $cnt;
-                                else
-                                  $averate = 0;
-                                echo '<th>'.$averate.'</th>';
-                              ?>
-                            <th>
-                                <?php
-                                    foreach($R_mapToCommen[$r['serialnumber']] as $s_comment){
-                                        echo '<input class="btn btn-xs btn-info" type="submit" value="' . $s_comment['comment'] . '">';
-                                    }
-                                ?>
-                            </th>
-                            <th>
-                                <?php
-                                    if(($session_auth_check & 8) != 8) {
-                                      echo '<button class="btn btn-xs btn-block disabled="" ">无相应权限</button>';
-                                      echo '</th><th>';
-                                    }                                    
-                                    else{
+                                    if($fetchRound['round'] == 6 || $fetchRound['round'] == 255) {
                                         echo '<form action="' . $admission_url . '" method="post">';
                                         echo '<input type="hidden" name="sn" value="' . $r['serialnumber'] . '">';
-                                        echo '<input type="hidden" name="request" value="getIn">';
-                                        echo '<input type="hidden" name="sector" value=2>';
-                                        echo '<button class="btn btn-xs btn-success btn-block" type="submit">该轮面试通过</button>';
-                                        echo '</form></th>';
-                                        
-                                        echo '<th>';
-                                        echo '<form action="' . $admission_url . '" method="post">';
-                                        echo '<input type="hidden" name="sn" value="' . $r['serialnumber'] . '">';
-                                        echo '<input type="hidden" name="request" value="getOut">';
-                                        echo '<input type="hidden" name="sector" value=2>';
-                                        echo '<button class="btn btn-xs btn-danger btn-block" type="submit">不予录取</button>';
+                                        if(($originSector & $sectorFlag) == $sectorFlag){
+                                            echo '<input type="hidden" name="request" value="getOut">';
+                                            echo '<button class="btn btn-xs btn-success btn-block" type="submit">录取</button>';
+                                        }else{
+                                            echo '<input type="hidden" name="request" value="getIn">';
+                                            echo '<button class="btn btn-xs btn-danger btn-block" type="submit">未录取</button>';
+                                        }
                                         echo '</form>';
                                     }
                                 ?>

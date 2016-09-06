@@ -53,9 +53,12 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand">面试考核系统</a>
+          <a class="navbar-brand" href="{$profile_url}">面试考核系统</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="{$profile_url}">个人页面</a></li>
+          </ul>
           <ul class="nav navbar-nav navbar-right">
             <li><a href="{$logout_url}">登出</a></li>
           </ul>
@@ -172,6 +175,18 @@
                                     case 3:
                                         echo '电视台 广播台';
                                         break;
+                                    case 4:
+                                        echo '校报社';
+                                        break;
+                                    case 5:
+                                        echo '电视台 校报社';
+                                        break;
+                                    case 6:
+                                        echo '广播台 校报社';
+                                        break;
+                                    case 7:
+                                        echo '电视台 广播台 校报社';
+                                        break;
                                 }
                             ?>
                           </th>
@@ -216,6 +231,12 @@
                           <th>{$i.serialnumber}</th>
                           <th>{$i.time1tid}</th>
                           <th>{$i.time2tid}</th>
+                          <th>
+                              <!-- <form action="{$checkout_url}" method="post"> -->
+                                  <!-- <input type="hidden" name="stuid" value={$i.studentid}> -->
+                                  <!-- <button class="btn btn-xs btn-danger btn-block" type="submit">移除</button> -->
+                              <!-- </form> -->
+                          </th>
                       </tr>
                     </volist>
                 </tbody>
