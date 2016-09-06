@@ -30,8 +30,6 @@ class IndexController extends Controller {
                     $this->redirect('Home/Index/screen');
                     break;
                 case 4:
-                    $this->redirect('Home/Index/interview');
-                    break;
                 case 8:
                     $this->redirect('Home/Index/interview');
                     break;
@@ -471,11 +469,22 @@ class IndexController extends Controller {
                     $waitingList['status'] = 1;
                     $waitingList['sector'] = $sector;
                     $waitingList['studentname'] = $studentname;
-                    if(!$WL->add($waitingList)) 
-                        $this->error('侯考列表更新失败');
+                    if(!$WL->add($waitingList)) {
+                        if ($fetchRound['round'] == 2) {
+                            if(!$Interviewee->where($addInterviewee)->delete()) {
+                                $this->error('回滚失败：删除面试者列表出错');
+                            }
+                        }
+                        else {
+                            if($Interviewee->where('studentid = ' . $stuId)->setField('status', 12) === false){
+                                $this->error('回滚失败：删除面试者列表出错');
+                            }
+                        }
+                        $this->error('侯考列表更新失败');                    
+                    }
 
                     $addsucc = 0;
-                    $maxinter = ($fetchRound['round'] == 2) ? 5 : 10;                       //inter_number_control
+                    $maxinter = ($fetchRound['round'] == 2) ? 5 : 10;             //inter_number_control
 
                     if ($fetchGroup[0]) {
                         foreach ($fetchGroup as $f) {
@@ -483,10 +492,25 @@ class IndexController extends Controller {
                             if ($f['status'] == 1 && $f['member_count'] < $maxinter) {
                                 $update_group = array('member_count'=>$newcnt, 'member'. $newcnt .'_sn'=>$serialNumber);
                                 if (!$Group->where('gid = '. $f['gid'])->setField($update_group)) {
+                                    // Enroll System
+                                    if ($fetchRound['round'] == 2) {
+                                        if(!$Interviewee->where($addInterviewee)->delete()) {
+                                            $this->error('回滚失败：删除面试者列表出错');
+                                        }
+                                    }
+                                    elseif($fetchRound['round'] == 6) {
+                                        if($Interviewee->where('studentid = ' . $stuId)->setField('status', 12) === false){
+                                            $this->error('回滚失败：更新面试者列表出错');
+                                        }
+                                    }
+                                    if (!$WL->where($waitingList)->delete()) {
+                                        $this->error('回滚失败：删除等待列表出错');
+                                    }
                                     $this->error('a类分组失败');
                                 }
                                 else {
                                     $addsucc = 1;
+                                    $is_group = 1;
                                     break;
                                 }
                             }
@@ -499,7 +523,24 @@ class IndexController extends Controller {
                         $addGroup['member1_sn'] = $serialNumber;
                         $addGroup['status'] = 1;
                         if (!$Group->add($addGroup)) {
+                            // Enroll System
+                            if ($fetchRound['round'] == 2) {
+                                if(!$Interviewee->where($addInterviewee)->delete()) {
+                                    $this->error('回滚失败：删除面试者列表出错');
+                                }
+                            }
+                            elseif($fetchRound['round'] == 6) {
+                                if($Interviewee->where('studentid = ' . $stuId)->setField('status', 12) === false){
+                                    $this->error('回滚失败：更新面试者列表出错');
+                                }
+                            }
+                            if (!$WL->where($waitingList)->delete()) {
+                                $this->error('回滚失败：删除等待列表出错');
+                            }
                             $this->error('b类分组失败');                                
+                        }
+                        else {
+                            $is_group = 2;
                         }
                     }
                 }
@@ -519,13 +560,36 @@ class IndexController extends Controller {
 
                 // REMOTE SHUTDOWN
                 if($Enroll->where($map)->setField('resultstatus', $newStatus) === false) {
+                    // Enroll System
+                    if ($fetchRound['round'] == 2) {
+                        if(!$Interviewee->where($addInterviewee)->delete()) {
+                            $this->error('回滚失败：删除面试者列表出错');
+                        }
+                    }
+                    elseif($fetchRound['round'] == 6) {
+                        if($Interviewee->where('studentid = ' . $stuId)->setField('status', 12) === false){
+                            $this->error('回滚失败：更新面试者列表出错');
+                        }
+                    }
+                    if (!$WL->where($waitingList)->delete()) {
+                        $this->error('回滚失败：删除等待列表出错');
+                    }
+
+                    if ($is_group == 1) {
+                        $rollback_group = array('member_count'=>$newcnt - 1, 'member'. $newcnt .'_sn'=>0);
+                        if (!$Group->where('gid = '. $f['gid'])->setField($rollback_group)) {
+                            $this->error('回滚失败：更新分组列表出错');
+                        }
+                    }
+                    else {
+                        if (!$Group->where($addGroup)->delete()) {
+                            $this->error('回滚失败：删除分组列表出错');
+                        }
+                    }
                     $this->error('远程状态更新失败');
                 }else{
-                    // addToGroup();
                     $this->success('检录成功，' . $fetchEnroll['studentname'] . '的流水号为 ' . $serialDigit, U('Home/Index/checkin'), 5);
-                    //$this->redirect('Home/Index/checkin');
                 }
-
             }
         }else{
             $this->error('无效的请求');
@@ -727,6 +791,19 @@ class IndexController extends Controller {
             $rates = $Rate->where($map)->find();
             $Room = M('rooms');
             $fetchRoom = $Room->where('rid = '. $_POST['rid'])->find();
+            $Interviewee = M('interviewees');
+            $fetchInterviewee = $Interviewee->where('studentid='. $_POST['stuId'])->find();
+
+            //*violence
+            $r_status_sector = $fetchInterviewee['multisector'] & 2;
+            $t_status_sector = $fetchInterviewee['multisector'] & 1;
+
+            if ($r_status_sector) {
+                $map['r_status'] |= 1;
+            }
+            if ($t_status_sector) {
+                $map['t_status'] |= 1;
+            }
 
             if ($fetchRoom['suid_core'] == $_SESSION['login_uid']) {
                 $map['t_rate_0'] = $_POST['t_rates'] ? $_POST['t_rates'] : -1;
@@ -862,10 +939,18 @@ class IndexController extends Controller {
                 $fetchsn = $f['member'. $i .'_sn'];
                 $fetchInterviewee = $Interviewee->where('serialnumber="'.$fetchsn.'"')->find();
                 if (!$Interviewee->where('serialnumber = "'. $fetchsn .'"')->setField('status', $newStatus)) {
-                    $this->error('更新本地状态失败');
+                    // Enroll System
+                    if (!$Group->where('gid='. $f['gid'])->setField('status',1)) {
+                            $this->error('回滚失败：修改分组状态出错');
+                    }
+                    $this->error('连续更新本地状态失败');
                 }
                 if (!$Enroll->where('studentid = "'. $fetchInterviewee['studentid'] .'"')->setField('resultstatus', $newStatus)) {
-                    $this->error('更新远端状态失败');
+                    // Enroll System
+                    if (!$Group->where('gid='. $f['gid'])->setField('status',1)) {
+                            $this->error('回滚失败：修改分组状态出错');
+                    }
+                    $this->error('连续更新远端状态失败');
                 }
             }
 
@@ -906,7 +991,6 @@ class IndexController extends Controller {
                 $sn = $fetchGroup['member' . $i . '_sn'];
                 $Rate = M('rates');
                 $map['serialnumber'] = $sn;
-                $map['uid'] = $_SESSION['login_uid'];
                 $map['round'] = $fetchRound['round'];
                 $fetchRate = $Rate->where($map)->find();
                 if(!$fetchRate) $this->error('请完成所有评分');
@@ -964,8 +1048,8 @@ class IndexController extends Controller {
         }
 
 
-        $fetchT_rate = $Rate->where('round = ' . $fetchRound['round'])->where('t_status = 0')->order('t_rate_0 desc')->select();
-        $fetchR_rate = $Rate->where('round = ' . $fetchRound['round'])->where('r_status = 0')->order('r_rate_0 desc')->select();
+        $fetchT_rate = $Rate->where('round = ' . $fetchRound['round'])->where('t_status = 1')->order('t_rate_0 desc')->select();
+        $fetchR_rate = $Rate->where('round = ' . $fetchRound['round'])->where('r_status = 1')->order('r_rate_0 desc')->select();
 
         if($fetchRound['round'] == 2 || $fetchRound['round'] == 6) {
             $Enroll = M('enroll2016_application');
@@ -1019,9 +1103,6 @@ class IndexController extends Controller {
             if($curRound != 2 && $curRound != 6){
                 $this->error('当前时段不允许更改成绩');
             }
-            if($fetchInterviewee['status'] != 8 && $fetchInterviewee['status'] != 32){
-                $this->error('当前用户状态不允许更改成绩');
-            }
 
             switch ($_POST['sector']) {
                 case 1:
@@ -1054,7 +1135,8 @@ class IndexController extends Controller {
             switch ($_POST['request']) {
                 case 'getIn':
                     $newSector = $originSector | $sectorFlag;
-                    if($Interviewee->where($map)->setField('multisector', $newSector) === false) {
+                    $newInterv = array('multisector'=>$newSector,'status'=>$newInStatus);
+                    if($Interviewee->where($map)->setField($newInterv) === false) {
                         $this->error('更新本地状态失败');
                     }
                     if($Enroll->where($map)->setField('resultstatus', $newInStatus) === false){
@@ -1071,17 +1153,20 @@ class IndexController extends Controller {
                         if($Enroll->where($map)->setField('resultstatus', $newOutStatus) === false){
                             $this->error('更新远程状态失败');
                         }
+                        if($Interviewee->where($map)->setField('status', $newOutStatus) === false){
+                            $this->error('更新本地状态失败');
+                        }
                     }
                     break;
                 default:
                     $this->error('无效的请求');
             }
-            
+            //*violence
             if ($_POST['sector'] == 1) {
-                $Rate->where($map)->setField('t_status', 1);
+                $Rate->where($map)->setField('t_status', 3);
             }
             else
-                $Rate->where($map)->setField('r_status', 1); 
+                $Rate->where($map)->setField('r_status', 3); 
                                  
             $this->redirect('Home/Index/grades');
         }else{

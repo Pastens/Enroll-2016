@@ -123,12 +123,12 @@
                                     echo '<th></th>';
                                     echo '<th>' . $fetchWaiting['studentname'] . '</th>';
                                     echo '<th></th>';
-                                    if ($fetchWaiting['sector'] == 1)
+                                    if (($fetchWaiting['sector'] & 1) == 1)
                                       echo '<th>电视台</th>';
                                     else
                                       echo '<th></th>';
 
-                                    if ($fetchWaiting['sector'] == 2)
+                                    if (($fetchWaiting['sector'] & 2) == 2)
                                       echo '<th>广播台</th>';
                                     else
                                       echo '<th></th></tr>';                                  
