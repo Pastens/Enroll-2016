@@ -109,12 +109,6 @@
                                     <button class="btn btn-m btn-danger">丢弃本地考点信息</button>
                                 </form>
                             </th>
-                            <th>
-                                <form action="{$dangerctl_url}" method="post">
-                                    <input type="hidden" name="request" value="confirmGrades">
-                                    <button class="btn btn-m btn-success">确认全部面试成绩</button>
-                                </form>
-                            </th>
                         </tbody>
                     </table>
                 </div>
@@ -292,11 +286,24 @@
                                 <th>考点</th>
                                 <th>组别</th>
                                 <th>主面</th>
-                                <th>辅一</th>
-                                <th>辅二</th>
-                                <th>辅三</th>
-                                <th>辅四</th>
+                                <th>辅1</th>
+                                <th>辅2</th>
+                                <th>辅3</th>
+                                <th>辅4</th>
+                                <th>辅5</th>
                                 <th>操作</th>
+                            </tr>
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th>辅6</th>
+                                <th>辅7</th>
+                                <th>辅8</th>
+                                <th>辅9</th>
+                                <th>辅10</th>
+                                <th>辅11</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -310,6 +317,7 @@
                                     <th>{$r.suid2}</th>
                                     <th>{$r.suid3}</th>
                                     <th>{$r.suid4}</th>
+                                    <th>{$r.suid5}</th>
                                     <th>
                                         <form action="{$management_url}" method="post">
                                             <input type="hidden" name="request" value="delete">
@@ -318,6 +326,18 @@
                                             <button class="btn btn-xs btn-danger btn-block" type="submit">DEL</button>
                                         </form>
                                     </th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>{$r.suid6}</th>
+                                    <th>{$r.suid7}</th>
+                                    <th>{$r.suid8}</th>
+                                    <th>{$r.suid9}</th>
+                                    <th>{$r.suid10}</th>
+                                    <th>{$r.suid11}</th>
+                                    <th></th>
                                 </tr>
                             </volist>
 
@@ -348,11 +368,37 @@
                                         <input type="text" name="suid4" class="form-control" >
                                     </th>
                                     <th>
-                                        <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
+                                        <input type="text" name="suid5" class="form-control" >
                                     </th>
+                                    <th></th>
+                                </tr>
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>
+                                        <input type="text" name="suid6" class="form-control" >
+                                    </th>
+                                    <th>
+                                        <input type="text" name="suid7" class="form-control" >
+                                    </th>
+                                    <th>
+                                        <input type="text" name="suid8" class="form-control" >
+                                    </th>
+                                    <th>
+                                        <input type="text" name="suid9" class="form-control" >
+                                    </th>
+                                    <th>
+                                        <input type="text" name="suid10" class="form-control" >
+                                    </th>                                    
+                                    <th>
+                                        <input type="text" name="suid11" class="form-control" >
+                                    </th>          
+                                    <th>
+                                        <button class="btn btn-sm btn-success btn-block" type="submit">ADD</button>
+                                    </th>                          
                                 </tr>
                             </form>
-
                         </tbody>
                     </table>
                 </div>
@@ -366,7 +412,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>环节</th>
-                                <th>开放</th>
+                                <th>人数</th>
                                 <th>M1</th>
                                 <th>M2</th>
                                 <th>M3</th>
@@ -377,8 +423,6 @@
                                 <th>M8</th>
                                 <th>M9</th>
                                 <th>MA</th>
-                                <th>MB</th>
-                                <th>MC</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -417,18 +461,11 @@
                                     <th>
                                         <?php echo substr($g['member10_sn'], 36, 4); ?>
                                     </th>
-                                    <th>
-                                        <?php echo substr($g['member11_sn'], 36, 4); ?>
-                                    </th>
-                                    <th>
-                                        <?php echo substr($g['member12_sn'], 36, 4); ?>
-                                    </th>
                                 </tr>
                             </volist>
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
     </div>

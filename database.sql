@@ -41,11 +41,25 @@ CREATE TABLE IF NOT EXISTS rates(
 	t_rate_2 int default -1 NOT NULL,
 	t_rate_3 int default -1 NOT NULL,
 	t_rate_4 int default -1 NOT NULL,
+	t_rate_5 int default -1 NOT NULL,
+	t_rate_6 int default -1 NOT NULL,
+	t_rate_7 int default -1 NOT NULL,
+	t_rate_8 int default -1 NOT NULL,
+	t_rate_9 int default -1 NOT NULL,
+	t_rate_10 int default -1 NOT NULL,
+	t_rate_11 int default -1 NOT NULL,
 	r_rate_0 int default -1 NOT NULL,
 	r_rate_1 int default -1 NOT NULL,
 	r_rate_2 int default -1 NOT NULL,
 	r_rate_3 int default -1 NOT NULL,
-	r_rate_4 int default -1 NOT NULL
+	r_rate_4 int default -1 NOT NULL,
+	r_rate_5 int default -1 NOT NULL,
+	r_rate_6 int default -1 NOT NULL,
+	r_rate_7 int default -1 NOT NULL,
+	r_rate_8 int default -1 NOT NULL,
+	r_rate_9 int default -1 NOT NULL,
+	r_rate_10 int default -1 NOT NULL,
+	r_rate_11 int default -1 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS comments(
@@ -69,7 +83,14 @@ CREATE TABLE IF NOT EXISTS rooms(
 	suid1 int NOT NULL,
 	suid2 int NOT NULL,
 	suid3 int NOT NULL,
-	suid4 int NOT NULL
+	suid4 int NOT NULL,
+	suid5 int NOT NULL,
+	suid6 int NOT NULL,
+	suid7 int NOT NULL,
+	suid8 int NOT NULL,
+	suid9 int NOT NULL,
+	suid10 int NOT NULL,
+	suid11 int NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS groups(
@@ -86,9 +107,7 @@ CREATE TABLE IF NOT EXISTS groups(
 	member7_sn varchar(255) default 0 NOT NULL,
 	member8_sn varchar(255) default 0 NOT NULL,
   	member9_sn varchar(255) default 0 NOT NULL,
-  	member10_sn varchar(255) default 0 NOT NULL,
-  	member11_sn varchar(255) default 0 NOT NULL,
-  	member12_sn varchar(255) default 0 NOT NULL
+  	member10_sn varchar(255) default 0 NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS times(
@@ -121,7 +140,6 @@ create table if not exists enroll2016_application(
         job2 char(3) default null,
         job3 char(3) default null,
         job4 char(3) default null,
-        job5 char(3) default null,
         interviewtime char(1) not null,
         interviewtime2 char(1) not null,
         introduction text not null,

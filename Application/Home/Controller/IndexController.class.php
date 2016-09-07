@@ -166,8 +166,15 @@ class IndexController extends Controller {
                             $map['suid2'] = $_POST['suid2'];
                             $map['suid3'] = $_POST['suid3'];
                             $map['suid4'] = $_POST['suid4'];
+                            $map['suid5'] = $_POST['suid5'];
+                            $map['suid6'] = $_POST['suid6'];
+                            $map['suid7'] = $_POST['suid7'];
+                            $map['suid8'] = $_POST['suid8'];
+                            $map['suid9'] = $_POST['suid9'];
+                            $map['suid10'] = $_POST['suid10'];
+                            $map['suid11'] = $_POST['suid11'];
                             $count = 0;
-                            for($i = 1; $i <= 4; $i++){
+                            for($i = 1; $i <= 11; $i++){                     //inter_number_control
                                 if($map['suid' . $i] != 0) $count++;
                             }
                             $map['susr_count'] = $count;
@@ -247,16 +254,11 @@ class IndexController extends Controller {
                     if($Rate->execute("TRUNCATE table `rates`") === false){
                         $this->error('丢弃评分失败');
                     }else{
-                        $Tag = M('tags');
-                        if($Tag->execute("TRUNCATE table `tags`") === false){
-                            $this->error('丢弃标签记录失败');
+                        $Comment = M('comments');
+                        if($Comment->execute("TRUNCATE table `comments`") === false){
+                            $this->error('丢弃备注信息失败');
                         }else{
-                            $Comment = M('comments');
-                            if($Comment->execute("TRUNCATE table `comments`") === false){
-                                $this->error('丢弃备注信息失败');
-                            }else{
-                                $this->success('已丢弃全部考核数据', U('/Home/Index/administration'));
-                            }
+                            $this->success('已丢弃全部考核数据', U('/Home/Index/administration'));
                         }
                     }
                     break;
@@ -268,48 +270,6 @@ class IndexController extends Controller {
                     }else{
                         $this->success('已重置本地考点分组', U('/Home/Index/administration'));
                     }
-                    break;
-                case 'confirmGrades':
-                    $Round = M('status_round');
-                    $fetchRound = $Round->find();
-
-                    // Set Model Enroll
-                    if($fetchRound['round'] == 2 || $fetchRound['round'] == 6) {
-                        $Enroll = M('enroll2016_application');
-                    }
-
-                    if($fetchRound['round'] == 2) {
-                        $newInStatus = 12;
-                    }
-                    elseif ($fetchRound['round'] == 6) {
-                        $newInStatus = 128;
-                    }
-                    $newOutStatus = 64;
-
-                    $Interviewee = M('interviewees');
-                    $fetchInterviewee = $Interviewee->select();
-                    foreach ($fetchInterviewee as $intv) {
-                        $map['studentid'] = $intv['studentid'];
-                        $map['version'] = 0;
-                        if($intv['multisector'] > 0) {
-                            if($Interviewee->where($map)->setField('status', $newInStatus) === false){
-                                $this->error('更新本地状态失败');
-                            }else{
-                                if($Enroll->where($map)->setField('resultstatus', $newInStatus) === false){
-                                    $this->error('更新远程状态失败');
-                                }
-                            }
-                        }else{
-                            if($Interviewee->where($map)->setField('status', $newOutStatus) === false){
-                                $this->error('更新本地状态失败');
-                            }else{
-                                if($Enroll->where($map)->setField('resultstatus', $newOutStatus) === false){
-                                    $this->error('更新远程状态失败');
-                                }
-                            }
-                        }
-                    }
-                    $this->success('成功更新成绩');
                     break;
                 default:
                     $this->error('无效的请求');
@@ -426,8 +386,7 @@ class IndexController extends Controller {
                     $job[2] = substr($fetchEnroll['job2'], 0, 1);
                     $job[3] = substr($fetchEnroll['job3'], 0, 1);
                     $job[4] = substr($fetchEnroll['job4'], 0, 1);
-                    $job[5] = substr($fetchEnroll['job5'], 0, 1);
-                    for($step = 1; $step <= 5; $step++){
+                    for($step = 1; $step <= 4; $step++){
                         if($job[$step] == 'A') { $addInterviewee['multisector'] |= 2; }
                         if($job[$step] == 'B') { $addInterviewee['multisector'] |= 1; }
                         if($job[$step] == 'C') { $addInterviewee['multisector'] |= 1; }
@@ -484,7 +443,7 @@ class IndexController extends Controller {
                     }
 
                     $addsucc = 0;
-                    $maxinter = ($fetchRound['round'] == 2) ? 5 : 10;             //inter_number_control
+                    $maxinter = 10;             //inter_number_control
 
                     if ($fetchGroup[0]) {
                         foreach ($fetchGroup as $f) {
@@ -629,8 +588,6 @@ class IndexController extends Controller {
             }
         }
 
-        if(!IS_GET) { $this->error('is_get_interview错误'); }
-
         $this->session_auth_check = $session_auth_check;
 
         $this->logout_url = U('Home/Index/logout_post');
@@ -681,16 +638,12 @@ class IndexController extends Controller {
         $Group = M('groups');
         $this->fetchGroup = $Group->where('gid = ' . $f['gid'])->find();
 
-        $this->rid = 1;                                                 //only one room available
+        $this->rid = 1;                                            //only one room available
         $this->fetchRoom = $f;
 
         $Interviewee = M('interviewees');
         if($fetchRound['round'] == 2 || $fetchRound['round'] == 6) {
             $Enroll = M('enroll2016_application');
-        }
-        // Simu Enroll
-        if($fetchRound['round'] == 254 || $fetchRound['round'] == 255) {
-            $Enroll = M('simu_enroll');
         }
 
         // Data Mapping
@@ -719,7 +672,7 @@ class IndexController extends Controller {
             // Format data
             if($enroll[$i]['shortphone'] == '') $enroll[$i]['shortphone'] = '------';
             if($enrollLast[$i]['shortphone'] == '') $enrollLast[$i]['shortphone'] = '------';
-            for($step = 1; $step <=5; $step++){
+            for($step = 1; $step <=4; $step++){
                 if($enroll[$i]['job' . $step] == ''){
                     $enroll[$i]['job' . $step] = '-- - 未填志愿  ';
                 }else{
@@ -754,10 +707,6 @@ class IndexController extends Controller {
             $fetchRound = $Round->find();
             if($fetchRound['round'] == 2 || $fetchRound['round'] == 6) {
                 $Enroll = M('enroll2016_application');
-            }
-            // Simu Enroll
-            if($fetchRound['round'] == 254 || $fetchRound['round'] == 255) {
-                $Enroll = M('simu_enroll');
             }
 
             $fetchInterviewee = $Interviewee->where('serialNumber = "' . $_GET['sn'] . '"')->find();
@@ -809,7 +758,7 @@ class IndexController extends Controller {
                 $map['t_rate_0'] = $_POST['t_rates'] ? $_POST['t_rates'] : -1;
                 $map['r_rate_0'] = $_POST['r_rates'] ? $_POST['r_rates'] : -1;
             }
-            for ($i=1; $i < 5; $i++) {
+            for ($i=1; $i < 12; $i++) {                             //inter_number_control
                 if ($fetchRoom['suid'. $i] == $_SESSION['login_uid']) {
                     $map['t_rate_'. $i] = $_POST['t_rates'] ? $_POST['t_rates'] : -1;
                     $map['r_rate_'. $i] = $_POST['r_rates'] ? $_POST['r_rates'] : -1;
