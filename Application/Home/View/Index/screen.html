@@ -51,19 +51,19 @@
               <tbody>
                   <volist name="fetchRoom" id="r">
                       <th>
-                          {$r.roomnumber}
+                          <button class="btn btn-lg btn-default btn-block">{$r.roomnumber}</button>
                       </th>
                       <th>
                           <?php
                             switch ($r['roomstatus']) {
                                 case 0:
-                                    echo '<button class="btn btn-xs btn-warning btn-block">未知</button>';
+                                    echo '<button class="btn btn-lg btn-warning btn-block">未知</button>';
                                     break;
                                 case 1:
-                                    echo '<button class="btn btn-xs btn-success btn-block">面试官正在啃瓜休息。。</button>';
+                                    echo '<button class="btn btn-lg btn-success btn-block">面试官正在啃瓜休息。。</button>';
                                     break;
                                 case 2:
-                                    echo '<button class="btn btn-xs btn-danger btn-block">开始面试</button>';
+                                    echo '<button class="btn btn-lg btn-danger btn-block">开始面试</button>';
                                     break;
                             }
                           ?>
@@ -77,7 +77,6 @@
           <div class="table-responsive">
               <table class="table table-striped">
                 <thead>
-                    <thead>
                   <tr>
                     <th>页面刷新</th>
                     <th>当前时间</th>
@@ -102,7 +101,9 @@
                     <th></th>
                     <th>姓名</th>
                     <th></th>
-                    <th>所报部门</th>
+                    <th>所报志愿</th>
+                    <th></th>
+                    <th></th>
                     <th></th>
                     </tr>
               </thead>
@@ -112,29 +113,23 @@
                       foreach ($fetchGroup as $f) {
                           if ($f['status'] == 1) {
                               $member_count = $f['member_count'];
-                              $WL = M('waiting_list');
+                              $Enroll = M('enroll2016_application');
+                              $Interviewee = M('interviewees');
 
                               for ($i=1; $i <= $member_count; $i++) { 
                                   $sn = $f['member'. $i .'_sn'];
-                                  $fetchWaiting = $WL->where('serialnumber = "' . $sn . '"')->find();
-                                  if($fetchWaiting) {
-                                    echo '<tr>';
-                                    echo '<th>' . $fetchWaiting['studentid'] . '</th>';
-                                    echo '<th></th>';
-                                    echo '<th>' . $fetchWaiting['studentname'] . '</th>';
-                                    echo '<th></th>';
-                                    if (($fetchWaiting['sector'] & 1) == 1)
-                                      echo '<th>电视台</th>';
+                                  $fetchInterviewee = $Interviewee->where('serialnumber = "' . $sn . '"')->find();
+                                  $fetchEnroll = $Enroll->where('studentid = "' .$fetchInterviewee['studentid']. '"')->find();
+                                  echo '<tr>';
+                                  echo '<th>' . $fetchEnroll['studentid'] . '</th>';
+                                  echo '<th></th>';
+                                  echo '<th>' . $fetchEnroll['studentname'] . '</th>';
+                                  echo '<th></th>';
+                                  for ($j=1; $j <= 4; $j++) { 
+                                    if($JobMapping[$fetchEnroll['job'.$j]])
+                                      echo '<th>' .$JobMapping[$fetchEnroll['job'.$j]]. '</th>';
                                     else
-                                      echo '<th></th>';
-
-                                    if (($fetchWaiting['sector'] & 2) == 2)
-                                      echo '<th>广播台</th>';
-                                    else
-                                      echo '<th></th></tr>';                                  
-                                  }
-                                  else {
-                                    echo '<tr><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
+                                      echo '<th>-----------------</th>';
                                   }
                               }
                               break;            
@@ -163,13 +158,15 @@
                 $("#remain-time").text(timer);
                 setInterval(function()
                 {
-                    if(timer<=1)
+                    if(timer>=1)
                     {
                         timer=timer-1;
                         $("#remain-time").text(timer);
                     }
-                    else
+                    else {          
+                        timer = 31;            
                         location.reload(true);
+                    }
                 },1000);
             }
             function getCurrentTime()
@@ -182,8 +179,6 @@
                     $('#current-time').text(now);
                 }, 1000);
             }
-
-        </script>
-
+      </script>
     </body>
 </html>

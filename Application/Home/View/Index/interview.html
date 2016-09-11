@@ -32,6 +32,9 @@
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="{$logout_url}">登出</a></li>
                 </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="{$results_url}">考核结果</a></li>
+                </ul>
             </div>
             <!--/.nav-collapse -->
         </div>
@@ -116,7 +119,6 @@
                             <th>备注</th>
                             <th></th>
                             <th>操作</th>
-                            <th></th>
                             <th></th>
                         </tr>
                     </thead>
@@ -224,13 +226,6 @@
                                       详细信息
                                     </button>
                                 </th>
-                                <th>
-                                    <?php
-                                        echo '<a href="';
-                                        echo U('Home/Index/allinfo_get', array('sn'=>$i['serialnumber']));
-                                        echo '" target="_blank" class="btn btn-info btn-sm">全部信息</a>';
-                                    ?>
-                                </th>
                             </tr>
                                 <div class="collapse col-md-12" id="{$i['serialnumber']}_allInfo">
                                   <div class="well">
@@ -238,8 +233,9 @@
 {$i['serialdigit']} &#9 {$jEL[$i['li']]['studentname']}  &#9 {$jEL[$i['li']]['mobilephone']}/{$jEL[$i['li']]['shortphone']} &#9 {$jEL[$i['li']]['birthplace']} &#9 {$jEL[$i['li']]['dormitory']} &#9 {$jEL[$i['li']]['grade']} &#9 {$jEL[$i['li']]['major']}<br />
 {$jEL[$i['li']]['job1']} &#9 {$jEL[$i['li']]['job2']} &#9 {$jEL[$i['li']]['job3']} &#9 {$jEL[$i['li']]['job4']} 
 <br />
-<span><img class="photo" style="width: 140px; height: auto; " src="https://join.zjubtv.com/ZJUCardPhoto/photo.do?pid={$i['studentid']}"></span>
+<!-- <span><img class="photo" style="width: 140px; height: auto; " src="https://join.zjubtv.com/ZJUCardPhoto/photo.do?pid={$i['studentid']}"></span> -->
 <span>{$jEL[$i['li']]['introduction']}</span>
+<br />
 <a class="btn btn-default btn-sm" data-toggle="collapse" data-target="#{$i['serialnumber']}_allInfo" aria-expanded="false" aria-controls="collapseExample" target="button_detailInfo-SN_{$i['serialnumber']}">收起</a>
                                       </pre>
                                   </div>

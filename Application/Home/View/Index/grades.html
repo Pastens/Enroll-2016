@@ -27,11 +27,6 @@
           </button>
           <a class="navbar-brand">面试考核系统</a>
         </div>
-        <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
-          <ul class="nav navbar-nav navbar-right">
-            <li><a href="{$logout_url}">登出</a></li>
-          </ul>
-        </div><!--/.nav-collapse -->
       </div>
     </nav>
 
@@ -67,7 +62,7 @@
                   <tbody>
                       <volist name="fetchT_rate" id="r">
                         <tr>
-                            <th><a href="https://bbs.zjutv.com/candidates.php?keyword={$r.studentid}" target="_blank">{$r.studentid}</a></th>
+                            <th>{$r.studentid}</th>
                             <th>{$T_mapToEnroll[$r['serialnumber']]['studentname']}</th>
                             <th>
                                 <?php
@@ -166,7 +161,7 @@
                   <tbody>
                       <volist name="fetchR_rate" id="r">
                         <tr>
-                            <th><a href="https://bbs.zjutv.com/candidates.php?keyword={$r.studentid}" target="_blank">{$r.studentid}</a></th>
+                            <th>{$r.studentid}</th>
                             <th>{$R_mapToEnroll[$r['serialnumber']]['studentname']}</th>
                             <th>
                                 <?php

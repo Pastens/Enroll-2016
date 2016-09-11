@@ -145,6 +145,7 @@ create table if not exists enroll2016_application(
         introduction text not null,
         impression text default null,
         isapplychinesecompetition boolean not null,
+        isacceptadjust boolean not null,
         useragent char(255) default null,
         submittime datetime default null,
         version int default 0 not null,

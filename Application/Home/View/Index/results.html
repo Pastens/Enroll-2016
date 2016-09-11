@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <title>ZJUBTV 面试考核系统</title>
+        <!-- Bootstrap core CSS -->
+        <css href="__PUBLIC__/css/bootstrap.min.css" />
+        <!-- Custom CSS-->
+        <css href="__PUBLIC__/css/list.css" />
+
+    </head>
+
+    <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand">面试考核系统</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse" aria-expanded="false" style="height: 1px;">
+          <ul class="nav navbar-nav navbar-right">
+              <li><a href="{$return_url}">返回</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <div class="starter-template">
+          <div class="table-responsive">
+              <h2>电视台二面/录取名单</h2>
+              <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>学号</th>
+                      <th>姓名</th>
+                      <th>性别</th>
+                      <th>联系方式</th>
+                      <th>志愿一</th>
+                      <th>志愿二</th>
+                      <th>志愿三</th>
+                      <th>志愿四</th>
+                      <th>是否服从调剂</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <volist name="T_fetchInterv" id="t">
+                        <tr>
+                            <?php
+                              $Enroll = M('enroll2016_application');
+                              $T_fetchEnroll = $Enroll->where('studentid = "' .$t['studentid']. '"')->find();
+                              echo '<th>' .$T_fetchEnroll['studentid']. '</th>';
+                              echo '<th>' .$T_fetchEnroll['studentname']. '</th>';
+                              switch ($T_fetchEnroll['gender']){
+                                case 0: echo'<th>女</th>';break;
+                                case 1: echo'<th>男</th>';break;
+                              }
+                              echo '<th>' .$T_fetchEnroll['mobilephone']. '</th>';
+                              for ($i=1; $i<=4; $i++) {
+                                if($T_fetchEnroll['job'.$i][0]=='B' || $T_fetchEnroll['job'.$i][0]=='C'){
+                                  echo'<th>' .$JobMapping[$T_fetchEnroll['job'.$i]]. '</th>';
+                                }
+                                else{
+                                  echo'<th>-----------------</th>';
+                                }
+                              }
+                              if ($T_fetchEnroll['isacceptadjust']){
+                                echo'<th>是</th>';
+                              }
+                              else{
+                                echo'<th>否</th>';
+                              }
+                            ?>
+                        </tr>
+                      </volist>
+                  </tbody>
+                </table>
+
+              <h2>广播台二面/录取名单</h2>
+              <table class="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>学号</th>
+                      <th>姓名</th>
+                      <th>性别</th>
+                      <th>联系方式</th>
+                      <th>志愿一</th>
+                      <th>志愿二</th>
+                      <th>志愿三</th>
+                      <th>志愿四</th>
+                      <th>是否服从调剂</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <volist name="R_fetchInterv" id="r">
+                        <tr>
+                            <?php
+                              $Enroll = M('enroll2016_application');
+                              $R_fetchEnroll = $Enroll->where('studentid = "' .$r['studentid']. '"')->find();
+                              echo '<th>' .$R_fetchEnroll['studentid']. '</th>';
+                              echo '<th>' .$R_fetchEnroll['studentname']. '</th>';
+                              switch ($R_fetchEnroll['gender']){
+                                case 0: echo'<th>女</th>';break;
+                                case 1: echo'<th>男</th>';break;
+                              }
+                              echo '<th>' .$R_fetchEnroll['mobilephone']. '</th>';
+                              for ($i=1; $i<=4; $i++) {
+                                if($R_fetchEnroll['job'.$i][0]=='A'){
+                                  echo'<th>' .$JobMapping[$R_fetchEnroll['job'.$i]]. '</th>';
+                                }
+                                else{
+                                  echo'<th>-----------------</th>';
+                                }
+                              }
+                              if ($R_fetchEnroll['isacceptadjust']){
+                                echo'<th>是</th>';
+                              }
+                              else{
+                                echo'<th>否</th>';
+                              }
+                            ?>
+                        </tr>
+                      </volist>
+                  </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div><!-- /.container -->
+
+        <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+        <js href="__PUBLIC__/js/jquery-1.11.3.min.js" />
+        <!-- Include all compiled plugins (below), or include individual files as needed -->
+        <js href="__PUBLIC__/js/bootstrap.min.js" />
+
+    </body>
+</html>

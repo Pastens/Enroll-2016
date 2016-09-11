@@ -232,6 +232,7 @@
                                 <th></th>
                                 <th></th>
                                 <th></th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -265,8 +266,16 @@
                                     <form action="{$management_url}" method="post">
                                         <input type="hidden" name="request" value="update">
                                         <input type="hidden" name="target" value="STATUS">
-                                        <input type="hidden" name="value" value="14">
-                                        <button class="btn btn-xs btn-danger btn-block" type="submit">结束</button>
+                                        <input type="hidden" name="value" value="8">
+                                        <button class="btn btn-xs btn-danger btn-block" type="submit">一面结束</button>
+                                    </form>
+                                </th>
+                                <th>
+                                    <form action="{$management_url}" method="post">
+                                        <input type="hidden" name="request" value="update">
+                                        <input type="hidden" name="target" value="STATUS">
+                                        <input type="hidden" name="value" value="12">
+                                        <button class="btn btn-xs btn-danger btn-block" type="submit">二面结束</button>
                                     </form>
                                 </th>
                             </tr>

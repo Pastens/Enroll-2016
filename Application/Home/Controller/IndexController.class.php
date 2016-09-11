@@ -87,8 +87,11 @@ class IndexController extends Controller {
                 case 6:
                     $this->fetchRound = "正在进行第二轮面试";
                     break;
-                case 14:
-                    $this->fetchRound = "面试已经结束";
+                case 8:
+                    $this->fetchRound = "第一轮面试已经结束";
+                    break;
+                case 12:
+                    $this->fetchRound = "第二轮面试已经结束";
                     break;
                 default:
                     $this->fetchRound = "未定义代码";
@@ -565,6 +568,22 @@ class IndexController extends Controller {
                 $this->error('无效的权限');
             }
         }
+        // Data Mapping
+        $JobMapping['A1'] = '广播记者编辑';
+        $JobMapping['A2'] = '广播新闻主播';
+        $JobMapping['A3'] = '广播栏目主播';
+        $JobMapping['A4'] = '广播英语主播';
+        $JobMapping['B1'] = '电视新闻记者';
+        $JobMapping['B2'] = '电视英语记者';
+        $JobMapping['B3'] = '电视摄像剪辑';
+        $JobMapping['B4'] = '新闻摄影记者';
+        $JobMapping['B5'] = '电视栏目主持';
+        $JobMapping['B6'] = '图像美工制作';
+        $JobMapping['C1'] = '通联员推广员';
+        $JobMapping['C2'] = '文字简讯编辑';
+        $JobMapping['C3'] = '图文美术编辑';
+        $JobMapping['C4'] = '程序员技术员';
+        $this->JobMapping = $JobMapping;
 
         $this->logout_url = U('Home/Index/logout_post');
 
@@ -591,6 +610,7 @@ class IndexController extends Controller {
         $this->session_auth_check = $session_auth_check;
 
         $this->logout_url = U('Home/Index/logout_post');
+        $this->results_url = U('Home/Index/results');
         $this->ratectl_url = U('Home/Index/grades');
 
         $this->setTags_url = U('Home/Index/admission_set_tags_post');
@@ -692,32 +712,51 @@ class IndexController extends Controller {
         $this->display();
     }
 
-    public function allinfo_get(){
+    public function results(){
         if (!isset($_SESSION['login_uid']) || !isset($_SESSION['login_auth'])) {
             $this->redirect('Home/Index/index');
+            echo 'err';
         }else{
             $session_auth_check = session('login_auth');
             if((($session_auth_check & 4) != 4) && (($session_auth_check & 8) != 8)){
                 $this->error('无效的权限');
             }
         }
-        if (IS_GET){
-            $Interviewee = M('interviewees');
-            $Round = M('status_round');
-            $fetchRound = $Round->find();
-            if($fetchRound['round'] == 2 || $fetchRound['round'] == 6) {
-                $Enroll = M('enroll2016_application');
-            }
+        // Data Mapping
+        $JobMapping['A1'] = '广播记者编辑';
+        $JobMapping['A2'] = '广播新闻主播';
+        $JobMapping['A3'] = '广播栏目主播';
+        $JobMapping['A4'] = '广播英语主播';
+        $JobMapping['B1'] = '电视新闻记者';
+        $JobMapping['B2'] = '电视英语记者';
+        $JobMapping['B3'] = '电视摄像剪辑';
+        $JobMapping['B4'] = '新闻摄影记者';
+        $JobMapping['B5'] = '电视栏目主持';
+        $JobMapping['B6'] = '图像美工制作';
+        $JobMapping['C1'] = '通联员推广员';
+        $JobMapping['C2'] = '文字简讯编辑';
+        $JobMapping['C3'] = '图文美术编辑';
+        $JobMapping['C4'] = '程序员技术员';
+        $this->JobMapping = $JobMapping;
 
-            $fetchInterviewee = $Interviewee->where('serialNumber = "' . $_GET['sn'] . '"')->find();
-            $fetchEnroll = $Enroll->where('studentid = ' . $fetchInterviewee['studentid'])->order('version')->select();
+        $Round = M('status_round');
+        $fetchRound = $Round->find();
 
-            echo '<head><meta charset="utf-8"></head>';
-            echo '从上至下依次为 最新版本到最老版本<br />';
-            dump($fetchEnroll);
-        }else{
-            $this->error('无效的请求');
+        $Interviewee = M('interviewees');
+        if ($fetchRound['round'] == 8) {
+            $T_fetchInterv = $Interviewee->where('status=12 and (multisector & 1)=1')->select();
+            $R_fetchInterv = $Interviewee->where('status=12 and (multisector & 2)=2')->select();
         }
+        elseif ($fetchRound['round'] == 12) {
+            $T_fetchInterv = $Interviewee->where('status=128 and (multisector & 1)=1')->select();
+            $R_fetchInterv = $Interviewee->where('status=128 and (multisector & 2)=2')->select();
+        }
+        $this->T_fetchInterv = $T_fetchInterv;
+        $this->R_fetchInterv = $R_fetchInterv;
+
+        $this->return_url = U('Home/Index/interview');
+
+        $this->display();
     }
 
     public function admission_set_marks_post(){
