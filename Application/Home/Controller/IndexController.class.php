@@ -625,7 +625,7 @@ class IndexController extends Controller {
         $rid = 0;
         $u = $_SESSION['login_uid'];
         foreach ($fetchRoom as $f) {
-            if($f['suid_core']==$u || $f['suid1']==$u || $f['suid2']==$u || $f['suid3']==$u || $f['suid4']==$u){
+            if($f['suid_core']==$u || $f['suid1']==$u || $f['suid2']==$u || $f['suid3']==$u || $f['suid4']==$u || $f['suid5']==$u || $f['suid6']==$u || $f['suid7']==$u || $f['suid8']==$u || $f['suid9']==$u || $f['suid10']==$u || $f['suid11']==$u){
                 $rid = $f['rid'];
                 break;
             }
@@ -687,7 +687,7 @@ class IndexController extends Controller {
             $sn = $this->fetchGroup['member' . $i . '_sn'];
             $inter[$i] = $Interviewee->where('serialnumber = "' . $sn . '"')->find();
             $inter[$i]['li'] = $i;
-            $enroll[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'])->order('version')->select();
+            $enroll[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->->find();
             $enrollLast[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->find();
             // Format data
             if($enroll[$i]['shortphone'] == '') $enroll[$i]['shortphone'] = '------';
