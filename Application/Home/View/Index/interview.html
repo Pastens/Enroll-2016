@@ -113,7 +113,9 @@
                     <thead>
                         <tr>
                             <th>姓名</th>
+                            <th></th>
                             <th>电视台打分</th>
+                            <th></th>
                             <th>广播台打分</th>
                             <th></th>
                             <th>备注</th>
@@ -125,15 +127,23 @@
                     <tbody>
                         <volist name="fetchInterviewee" id="i">
                             <tr>
-                                <th>{$joinEnroll[$i['li']][0]['studentname']}</th>
-                                <?php                               //set rates
+                                <th>{$i['studentname']}</th>
+                                <?php                               //show&set rates
                                     $is_tel = $i['multisector'] & 1;
                                     $is_rad = $i['multisector'] & 2;
+                                    $Rate = M('rates');
+                                    $fetchRate = $Rate->where('studentid = "' .$i['studentid']. '"')->find();
                                     echo '<form action="' . $setMark_url . '" method="post">';
                                     echo '<input type="hidden" name="stuId" value="' . $i['studentid'] . '">';
                                     echo '<input type="hidden" name="rid" value="' . $rid . '">';
                                     echo '<input type="hidden" name="sn" value="' . $i['serialnumber'] . '">';
                                     echo '<input type="hidden" name="sd" value="' . $i['serialdigit'] . '">';
+
+                                    if($fetchRate['t_rate_'.$interid] == -1)
+                                        echo '<th>无</th>';
+                                    else
+                                        echo '<th>' .$fetchRate['t_rate_'.$interid]. '</th>';
+
                                     if ($is_tel == 1) {
                                         echo '
                                             <th>
@@ -157,6 +167,12 @@
                                         <th>未报名此部门</th>
                                         ';
                                     }
+
+                                    if($fetchRate['r_rate_'.$interid] == -1)
+                                        echo '<th>无</th>';
+                                    else
+                                        echo '<th>' .$fetchRate['r_rate_'.$interid]. '</th>';
+
                                     if ($is_rad == 2) {
                                         echo '
                                             <th>
@@ -186,41 +202,41 @@
                                         </th>
                                     ';
                                 ?>
-                                    <th>
-                                        <?php                                           //show comments
-                                            $Comment = M('comments');
-                                            $map['studentid'] = $i['studentid'];
-                                            $map['serialnumber'] = $i['serialnumber'];
-                                            $map['uid'] = $_SESSION['login_uid'];
-                                            $Rounds = M('status_round');
-                                            $fetchRound = $Rounds->find();
-                                            $map['round'] = $fetchRound['round'];
-                                            $comments = $Comment->where($map)->select();
-                                            if($comments){
-                                                foreach($comments as $comm){
-                                                    echo '<form action="' . $rmvComm_url . '" method="post">';
-                                                    echo '<input type="hidden" name="commId" value="' . $comm['commid'] . '">';
-                                                    echo '<input type="hidden" name="rid" value="' . $rid . '">';
-                                                    echo '[' . $comm['comment'] . ']';
-                                                    echo '<input class="btn btn-xs btn-danger"  type="submit" value="DEL">';
-                                                    echo '</form>';
-                                                }
-                                            }else{
-                                                echo '尚未有备注';
+                                <th>
+                                    <?php                                           //show comments
+                                        $Comment = M('comments');
+                                        $map['studentid'] = $i['studentid'];
+                                        $map['serialnumber'] = $i['serialnumber'];
+                                        $map['uid'] = $_SESSION['login_uid'];
+                                        $Rounds = M('status_round');
+                                        $fetchRound = $Rounds->find();
+                                        $map['round'] = $fetchRound['round'];
+                                        $comments = $Comment->where($map)->select();
+                                        if($comments){
+                                            foreach($comments as $comm){
+                                                echo '<form action="' . $rmvComm_url . '" method="post">';
+                                                echo '<input type="hidden" name="commId" value="' . $comm['commid'] . '">';
+                                                echo '<input type="hidden" name="rid" value="' . $rid . '">';
+                                                echo '[' . $comm['comment'] . ']';
+                                                echo '<input class="btn btn-xs btn-danger"  type="submit" value="DEL">';
+                                                echo '</form>';
                                             }
-                                        ?>
-                                    </th>
-                                    <th>
-                                        <form action="{$setComm_url}" method="post">    //set comments
-                                            <input type="hidden" name="stuId" value="{$i['studentid']}">
-                                            <input type="hidden" name="sn" value="{$i['serialnumber']}">
-                                            <input type="hidden" name="sd" value="{$i['serialdigit']}">
-                                            <input type="text" name="comment" class="form-control" value="">
-                                            <input type="hidden" name="rid" value="{$rid}">
-                                    </th>
-                                    <th><input class="btn btn-sm btn-primary" type="submit" value="新增备注">
-                                        </form>
-                                    </th>
+                                        }else{
+                                            echo '尚未有备注';
+                                        }
+                                    ?>
+                                </th>
+                                <th>
+                                    <form action="{$setComm_url}" method="post">    //set comments
+                                        <input type="hidden" name="stuId" value="{$i['studentid']}">
+                                        <input type="hidden" name="sn" value="{$i['serialnumber']}">
+                                        <input type="hidden" name="sd" value="{$i['serialdigit']}">
+                                        <input type="text" name="comment" class="form-control" value="">
+                                        <input type="hidden" name="rid" value="{$rid}">
+                                </th>
+                                <th><input class="btn btn-sm btn-primary" type="submit" value="新增备注">
+                                    </form>
+                                </th>
                                 <th>
                                     <button class="btn btn-info btn-sm" type="button" data-toggle="collapse" data-target="#{$i['serialnumber']}_allInfo" aria-expanded="false" aria-controls="collapseExample">
                                       详细信息

@@ -658,7 +658,8 @@ class IndexController extends Controller {
         $Group = M('groups');
         $this->fetchGroup = $Group->where('gid = ' . $f['gid'])->find();
 
-        $this->rid = 1;                                            //only one room available
+
+        $this->rid = $rid;                                            //only one room available
         $this->fetchRoom = $f;
 
         $Interviewee = M('interviewees');
@@ -687,17 +688,18 @@ class IndexController extends Controller {
             $sn = $this->fetchGroup['member' . $i . '_sn'];
             $inter[$i] = $Interviewee->where('serialnumber = "' . $sn . '"')->find();
             $inter[$i]['li'] = $i;
+<<<<<<< HEAD
             $enroll[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->find();
             $enrollLast[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->find();
+=======
+
+            $condition['studentid'] = $inter[$i]['studentid'];
+            $condition['version'] = 0;
+            $enrollLast[$i] = $Enroll->where($condition)->find();
+>>>>>>> 643cc83efe7dbe768de31b9971c6f51295a712d2
             // Format data
-            if($enroll[$i]['shortphone'] == '') $enroll[$i]['shortphone'] = '------';
             if($enrollLast[$i]['shortphone'] == '') $enrollLast[$i]['shortphone'] = '------';
             for($step = 1; $step <=4; $step++){
-                if($enroll[$i]['job' . $step] == ''){
-                    $enroll[$i]['job' . $step] = '-- - 未填志愿  ';
-                }else{
-                    $enroll[$i]['job' . $step] = $JobMapping[$enroll[$i]['job' . $step]];
-                }
                 if($enrollLast[$i]['job' . $step] == ''){
                     $enrollLast[$i]['job' . $step] = '-- - 未填志愿  ';
                 }else{
@@ -706,8 +708,21 @@ class IndexController extends Controller {
             }
         }
         $this->fetchInterviewee = $inter;
-        $this->joinEnroll = $enroll;
         $this->jEL = $enrollLast;
+
+        $fetchRoom = $Room->where('rid = '.$rid)->find();
+        if ($fetchRoom['suid_core'] == $_SESSION['login_uid']) {
+            $interid = 0;
+        }
+        else {
+            for ($i=1; $i <= 11 ; $i++) { 
+                if ($fetchRoom['suids'. $i] == $_SESSION['login_uid']) {
+                    $interid = $i;
+                    break;
+                }
+            }
+        }
+        $this->interid = $interid;
 
         $this->display();
     }
@@ -926,17 +941,21 @@ class IndexController extends Controller {
             for ($i=1; $i <= $member_count; $i++) { 
                 $fetchsn = $f['member'. $i .'_sn'];
                 $fetchInterviewee = $Interviewee->where('serialnumber="'.$fetchsn.'"')->find();
+                $oldStatus = $fetchInterviewee['status'];
                 if (!$Interviewee->where('serialnumber = "'. $fetchsn .'"')->setField('status', $newStatus)) {
                     // Enroll System
                     if (!$Group->where('gid='. $f['gid'])->setField('status',1)) {
-                            $this->error('回滚失败：修改分组状态出错');
+                        $this->error('回滚失败：修改分组状态出错');
                     }
                     $this->error('连续更新本地状态失败');
                 }
                 if (!$Enroll->where('studentid = "'. $fetchInterviewee['studentid'] .'"')->setField('resultstatus', $newStatus)) {
                     // Enroll System
+                    if (!$Interviewee->where('serialnumber = "'. $fetchsn .'"')->setField('status', $oldStatus)) {
+                        $this->error('回滚失败：更新面试者列表出错');
+                    }
                     if (!$Group->where('gid='. $f['gid'])->setField('status',1)) {
-                            $this->error('回滚失败：修改分组状态出错');
+                        $this->error('回滚失败：修改分组状态出错');
                     }
                     $this->error('连续更新远端状态失败');
                 }
