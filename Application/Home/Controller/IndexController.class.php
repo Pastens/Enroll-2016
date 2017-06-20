@@ -687,7 +687,7 @@ class IndexController extends Controller {
             $sn = $this->fetchGroup['member' . $i . '_sn'];
             $inter[$i] = $Interviewee->where('serialnumber = "' . $sn . '"')->find();
             $inter[$i]['li'] = $i;
-            $enroll[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->->find();
+            $enroll[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->find();
             $enrollLast[$i] = $Enroll->where('studentid = ' . $inter[$i]['studentid'] . ' and version=0')->find();
             // Format data
             if($enroll[$i]['shortphone'] == '') $enroll[$i]['shortphone'] = '------';
